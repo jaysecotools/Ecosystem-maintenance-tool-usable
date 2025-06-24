@@ -1254,7 +1254,17 @@
     }
 
     function initMap() {
+        // Ensure the map container exists and is visible
+        const mapElement = document.getElementById('map');
+        if (!mapElement) {
+            console.error('Map container not found');
+            return;
+        }
+
+        // Initialize the map with a default view
         const map = L.map('map').setView([-33.8688, 151.2093], 13);
+        
+        // Add OpenStreetMap tiles
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
@@ -1269,6 +1279,27 @@
             
         L.marker([-33.866, 151.211]).addTo(map)
             .bindPopup('Zone 2 - Weed Control Area');
+
+        // Add map controls event listeners
+        document.getElementById('zoneToggle').addEventListener('click', function() {
+            this.classList.toggle('active');
+            // Add your zone layer toggle logic here
+        });
+
+        document.getElementById('vegetationToggle').addEventListener('click', function() {
+            this.classList.toggle('active');
+            // Add your vegetation layer toggle logic here
+        });
+
+        document.getElementById('weedsToggle').addEventListener('click', function() {
+            this.classList.toggle('active');
+            // Add your weeds layer toggle logic here
+        });
+
+        // Invalidate map size when tab is shown to ensure proper rendering
+        document.querySelector('a[href="#dashboard"]').addEventListener('shown.bs.tab', function() {
+            map.invalidateSize();
+        });
     }
 
     function setupEventListeners() {
@@ -1289,6 +1320,17 @@
 
         // Reset data button
         document.getElementById('resetDataBtn').addEventListener('click', resetData);
+
+        // Add event listeners for tab changes to ensure map resizes properly
+        const tabLinks = document.querySelectorAll('[data-bs-toggle="tab"]');
+        tabLinks.forEach(tab => {
+            tab.addEventListener('shown.bs.tab', function() {
+                // Check if map is initialized and invalidate size
+                if (window.map) {
+                    window.map.invalidateSize();
+                }
+            });
+        });
     }
 
     function showAddForm(itemType) {
