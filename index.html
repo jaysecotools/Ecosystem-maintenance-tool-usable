@@ -1,3 +1,394 @@
+// Global variables
+const appData = {
+    assessments: JSON.parse(localStorage.getItem('assessments')) || [
+        {
+            id: 1,
+            date: "2023-06-15",
+            assessor: "Jane Doe",
+            description: "Initial site assessment of the conservation area",
+            components: {
+                flora: true,
+                fauna: true,
+                soil: true,
+                water: true,
+                geology: false,
+                climate: true
+            },
+            health: "good",
+            threats: ["weeds", "erosion"],
+            timestamp: "2023-06-15T10:30:00Z"
+        },
+        {
+            id: 2,
+            date: "2023-03-02",
+            assessor: "John Smith",
+            description: "Quarterly ecosystem health check",
+            components: {
+                flora: true,
+                fauna: true,
+                soil: true,
+                water: false,
+                geology: false,
+                climate: true
+            },
+            health: "fair",
+            threats: ["weeds", "pests"],
+            timestamp: "2023-03-02T14:15:00Z"
+        }
+    ],
+    maintenanceActivities: JSON.parse(localStorage.getItem('maintenanceActivities')) || [
+        {
+            id: 1,
+            name: "Weed Control - Blackberry",
+            type: "Weed Management",
+            scheduledDate: "2023-06-25",
+            location: "Zone 3",
+            assignedTo: "John Smith",
+            status: "scheduled",
+            description: "Control blackberry infestation in Zone 3"
+        },
+        {
+            id: 2,
+            name: "Fauna Survey - Eastern Zone",
+            type: "Monitoring",
+            scheduledDate: "2023-06-28",
+            location: "Eastern Zone",
+            assignedTo: "Survey Team",
+            status: "scheduled",
+            description: "Quarterly fauna survey in eastern zone"
+        },
+        {
+            id: 3,
+            name: "Erosion Control - North Bank",
+            type: "Erosion Control",
+            scheduledDate: "2023-06-15",
+            completedDate: "2023-06-15",
+            location: "Northern Boundary",
+            assignedTo: "Grounds Team",
+            status: "completed",
+            description: "Install erosion controls on north bank"
+        }
+    ],
+    species: JSON.parse(localStorage.getItem('species')) || [
+        {
+            id: 1,
+            scientificName: "Eucalyptus pauciflora",
+            commonName: "Snow Gum",
+            type: "flora",
+            status: "native",
+            lastObserved: "2023-06-15",
+            description: "Dominant tree species in the area"
+        },
+        {
+            id: 2,
+            scientificName: "Rubus fruticosus",
+            commonName: "Blackberry",
+            type: "flora",
+            status: "weed",
+            lastObserved: "2023-06-10",
+            description: "Invasive weed species, high priority for control"
+        },
+        {
+            id: 3,
+            scientificName: "Phascolarctos cinereus",
+            commonName: "Koala",
+            type: "fauna",
+            status: "endangered",
+            lastObserved: "2023-06-05",
+            description: "Occasional sightings in the conservation area"
+        }
+    ],
+    monitoring: JSON.parse(localStorage.getItem('monitoring')) || [
+        {
+            id: 1,
+            date: "2023-06-15",
+            type: "vegetation",
+            location: "Zone 1",
+            observer: "Jane Doe",
+            findings: "Increased native cover compared to last survey",
+            species: ["Eucalyptus pauciflora"]
+        },
+        {
+            id: 2,
+            date: "2023-06-12",
+            type: "fauna",
+            location: "Eastern Zone",
+            observer: "Survey Team",
+            findings: "Koala sighting near creek line",
+            species: ["Phascolarctos cinereus"]
+        }
+    ],
+    reports: JSON.parse(localStorage.getItem('reports')) || [
+        {
+            id: 1,
+            date: "2023-06-01",
+            type: "monthly-maintenance",
+            generatedBy: "Jane Doe",
+            period: "May 2023",
+            content: "Monthly maintenance report for May 2023"
+        },
+        {
+            id: 2,
+            date: "2023-05-01",
+            type: "monthly-maintenance",
+            generatedBy: "Jane Doe",
+            period: "April 2023",
+            content: "Monthly maintenance report for April 2023"
+        }
+    ]
+};
+
+// Chart instances
+let healthChart = null;
+let faunaChart = null;
+let vegetationChart = null;
+let map = null;
+
+// Current item being edited/added
+let currentItemType = null;
+let currentItemId = null;
+
+// Save data to localStorage
+function saveData() {
+    localStorage.setItem('assessments', JSON.stringify(appData.assessments));
+    localStorage.setItem('maintenanceActivities', JSON.stringify(appData.maintenanceActivities));
+    localStorage.setItem('species', JSON.stringify(appData.species));
+    localStorage.setItem('monitoring', JSON.stringify(appData.monitoring));
+    localStorage.setItem('reports', JSON.stringify(appData.reports));
+    updateAllDisplays();
+}
+
+// Initialize the application
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize components only when their containers exist
+    if (document.getElementById('healthChart')) initCharts();
+    if (document.getElementById('map')) initMap();
+    
+    setupEventListeners();
+    updateAllDisplays();
+});
+
+function initCharts() {
+    // Destroy existing charts if they exist
+    if (healthChart) healthChart.destroy();
+    if (faunaChart) faunaChart.destroy();
+    if (vegetationChart) vegetationChart.destroy();
+
+    // Health chart
+    const healthCtx = document.getElementById('healthChart').getContext('2d');
+    healthChart = new Chart(healthCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Native Vegetation', 'Weed Cover', 'Erosion', 'Other'],
+            datasets: [{
+                data: [78, 22, 15, 5],
+                backgroundColor: [
+                    '#28a745',
+                    '#dc3545',
+                    '#fd7e14',
+                    '#6c757d'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        boxWidth: 12
+                    }
+                }
+            },
+            cutout: '70%'
+        }
+    });
+
+    // Fauna chart
+    const faunaCtx = document.getElementById('faunaChart').getContext('2d');
+    faunaChart = new Chart(faunaCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Fauna Observations',
+                data: [12, 19, 15, 17, 21, 23],
+                backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Vegetation chart
+    const vegetationCtx = document.getElementById('vegetationChart').getContext('2d');
+    vegetationChart = new Chart(vegetationCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Native Vegetation Cover (%)',
+                data: [65, 67, 68, 72, 75, 78],
+                fill: false,
+                backgroundColor: 'rgba(40, 167, 69, 0.6)',
+                borderColor: 'rgba(40, 167, 69, 1)',
+                tension: 0.1,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    min: 50,
+                    max: 100
+                }
+            }
+        }
+    });
+}
+
+function initMap() {
+    const mapElement = document.getElementById('map');
+    if (!mapElement) return;
+
+    // Remove existing map if it exists
+    if (map) {
+        map.remove();
+        map = null;
+    }
+
+    // Initialize new map
+    map = L.map('map').setView([-33.8688, 151.2093], 13);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Add markers
+    L.marker([-33.8688, 151.2093]).addTo(map)
+        .bindPopup('Main Conservation Area')
+        .openPopup();
+        
+    L.marker([-33.871, 151.207]).addTo(map)
+        .bindPopup('Zone 1 - Native Vegetation');
+        
+    L.marker([-33.866, 151.211]).addTo(map)
+        .bindPopup('Zone 2 - Weed Control Area');
+
+    // Map controls
+    document.getElementById('zoneToggle').addEventListener('click', function() {
+        this.classList.toggle('active');
+        // Layer control logic would go here
+    });
+
+    document.getElementById('vegetationToggle').addEventListener('click', function() {
+        this.classList.toggle('active');
+        // Layer control logic would go here
+    });
+
+    document.getElementById('weedsToggle').addEventListener('click', function() {
+        this.classList.toggle('active');
+        // Layer control logic would go here
+    });
+}
+
+function setupEventListeners() {
+    // Site assessment form
+    const assessmentForm = document.getElementById('assessmentForm');
+    if (assessmentForm) {
+        assessmentForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveAssessment();
+        });
+    }
+
+    // New item buttons
+    document.getElementById('newActivityBtn')?.addEventListener('click', () => showAddForm('activity'));
+    document.getElementById('newSpeciesBtn')?.addEventListener('click', () => showAddForm('species'));
+    document.getElementById('newMonitoringBtn')?.addEventListener('click', () => showAddForm('monitoring'));
+    document.getElementById('generateReportBtn')?.addEventListener('click', () => showAddForm('report'));
+
+    // Save modal form
+    document.getElementById('saveModalForm')?.addEventListener('click', saveModalForm);
+
+    // Reset data button
+    document.getElementById('resetDataBtn')?.addEventListener('click', resetData);
+
+    // Tab changes
+    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+        tab.addEventListener('shown.bs.tab', function() {
+            // Handle map resizing when tab changes
+            if (map) {
+                setTimeout(() => map.invalidateSize(), 100);
+            }
+            
+            // Initialize charts when dashboard tab is shown
+            if (this.getAttribute('href') === '#dashboard') {
+                initCharts();
+            }
+        });
+    });
+}
+
+// ... [Rest of your functions remain the same until updateAllDisplays]
+
+function updateAllDisplays() {
+    // Update charts if they exist
+    if (healthChart) {
+        healthChart.data.datasets[0].data = [78, 22, 15, 5];
+        healthChart.update();
+    }
+    
+    if (faunaChart) {
+        faunaChart.data.datasets[0].data = [12, 19, 15, 17, 21, 23];
+        faunaChart.update();
+    }
+    
+    if (vegetationChart) {
+        vegetationChart.data.datasets[0].data = [65, 67, 68, 72, 75, 78];
+        vegetationChart.update();
+    }
+
+    updateDashboard();
+    updateAssessmentsTable();
+    updateMaintenanceTables();
+    updateSpeciesDisplay();
+    updateMonitoringDisplay();
+    updateReportsDisplay();
+}
+
+// ... [Include all your remaining functions exactly as they were]
+// Make sure to include:
+// - showAddForm()
+// - saveModalForm()
+// - saveAssessment()
+// - resetData()
+// - updateDashboard()
+// - updateAssessmentsTable()
+// - updateMaintenanceTables()
+// - updateSpeciesDisplay()
+// - updateMonitoringDisplay()
+// - updateReportsDisplay()
+// - getStatusBadgeClass()
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
