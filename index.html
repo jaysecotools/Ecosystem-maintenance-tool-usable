@@ -1,0 +1,1830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Native Ecosystem Maintenance Tool | AHCECR301 Compliance</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background-color: #2c3e50;
+            color: white;
+        }
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 5px;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: #34495e;
+        }
+        .sidebar .nav-link i {
+            margin-right: 10px;
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .map-container {
+            height: 400px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .species-card {
+            transition: transform 0.2s;
+        }
+        .species-card:hover {
+            transform: translateY(-5px);
+        }
+        .risk-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .risk-low {
+            background-color: #28a745;
+        }
+        .risk-medium {
+            background-color: #ffc107;
+        }
+        .risk-high {
+            background-color: #dc3545;
+        }
+        .logo {
+            font-weight: 700;
+            padding: 15px;
+            font-size: 1.2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        #map { 
+            height: 100%;
+            width: 100%;
+            border-radius: 5px;
+        }
+        .map-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+        }
+        .leaflet-top.leaflet-right {
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-0">
+                <div class="logo">EcoMaintain</div>
+                <ul class="nav flex-column p-3">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#dashboard" data-bs-toggle="tab">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#site-assessment" data-bs-toggle="tab">
+                            <i class="bi bi-clipboard-data"></i> Site Assessment
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#maintenance-plan" data-bs-toggle="tab">
+                            <i class="bi bi-calendar-check"></i> Maintenance Plan
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#species-register" data-bs-toggle="tab">
+                            <i class="bi bi-tree"></i> Species Register
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#monitoring" data-bs-toggle="tab">
+                            <i class="bi bi-binoculars"></i> Monitoring
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#reports" data-bs-toggle="tab">
+                            <i class="bi bi-file-earmark-text"></i> Reports
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#legislation" data-bs-toggle="tab">
+                            <i class="bi bi-journal-bookmark"></i> Legislation
+                        </a>
+                    </li>
+                    <li class="nav-item mt-4">
+                        <a class="nav-link" href="#settings" data-bs-toggle="tab">
+                            <i class="bi bi-gear"></i> Settings
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 ms-sm-auto main-content">
+                <div class="tab-content">
+                    <!-- Dashboard Tab -->
+                    <div class="tab-pane fade show active" id="dashboard">
+                        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            <h1 class="h2">Native Ecosystem Maintenance Dashboard</h1>
+                            <div class="btn-toolbar mb-2 mb-md-0">
+                                <div class="btn-group me-2">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary">Print</button>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-success" id="newActivityBtn">
+                                    <i class="bi bi-plus"></i> New Activity
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Upcoming Tasks</h5>
+                                        <div class="list-group" id="upcomingTasksList">
+                                            <!-- Tasks will be populated by JavaScript -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Site Health Indicators</h5>
+                                        <canvas id="healthChart" height="200"></canvas>
+                                        <div class="mt-3">
+                                            <span class="badge bg-success me-2" id="biodiversityBadge">Biodiversity: 78%</span>
+                                            <span class="badge bg-warning me-2" id="weedCoverBadge">Weed Cover: 22%</span>
+                                            <span class="badge bg-danger" id="erosionBadge">Erosion: 15%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Recent Observations</h5>
+                                        <ul class="list-group list-group-flush" id="recentObservationsList">
+                                            <!-- Observations will be populated by JavaScript -->
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Site Map</h5>
+                                        <div class="map-container p-3">
+                                            <div id="map"></div>
+                                            <div class="map-controls">
+                                                <div class="btn-group-vertical">
+                                                    <button id="zoneToggle" class="btn btn-sm btn-outline-primary active">Zones</button>
+                                                    <button id="vegetationToggle" class="btn btn-sm btn-outline-success">Vegetation</button>
+                                                    <button id="weedsToggle" class="btn btn-sm btn-outline-danger">Weeds</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Compliance Checklist</h5>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="check1" checked>
+                                            <label class="form-check-label" for="check1">
+                                                Identified ecosystem components
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="check2" checked>
+                                            <label class="form-check-label" for="check2">
+                                                Assessed ecosystem health
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="check3">
+                                            <label class="form-check-label" for="check3">
+                                                Completed weed control plan
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="check4">
+                                            <label class="form-check-label" for="check4">
+                                                Recorded fauna observations
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="check5" checked>
+                                            <label class="form-check-label" for="check5">
+                                                Implemented erosion controls
+                                            </label>
+                                        </div>
+                                        <div class="progress mt-3">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">60% Complete</div>
+                                        </div>
+                                        <button class="btn btn-sm btn-primary mt-3">Generate Compliance Report</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Site Assessment Tab -->
+                    <div class="tab-pane fade" id="site-assessment">
+                        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            <h1 class="h2">Site Assessment</h1>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">New Site Assessment</h5>
+                                <form id="assessmentForm">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="assessmentDate" class="form-label">Assessment Date</label>
+                                            <input type="date" class="form-control" id="assessmentDate" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="assessorName" class="form-label">Assessor Name</label>
+                                            <input type="text" class="form-control" id="assessorName" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="siteDescription" class="form-label">Site Description</label>
+                                        <textarea class="form-control" id="siteDescription" rows="3" required></textarea>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Ecosystem Components Present</label>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="flora">
+                                                    <label class="form-check-label" for="flora">Flora</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="fauna">
+                                                    <label class="form-check-label" for="fauna">Fauna</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="soil">
+                                                    <label class="form-check-label" for="soil">Soil</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="water">
+                                                    <label class="form-check-label" for="water">Water</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="geology">
+                                                    <label class="form-check-label" for="geology">Geology</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="climate">
+                                                    <label class="form-check-label" for="climate">Climate</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="ecosystemHealth" class="form-label">Ecosystem Health Assessment</label>
+                                        <select class="form-select" id="ecosystemHealth" required>
+                                            <option value="" selected disabled>Select health rating...</option>
+                                            <option value="excellent">Excellent - Minimal disturbance</option>
+                                            <option value="good">Good - Some disturbance but recovering</option>
+                                            <option value="fair">Fair - Moderate disturbance</option>
+                                            <option value="poor">Poor - Significant disturbance</option>
+                                            <option value="degraded">Degraded - Severe disturbance</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="threats" class="form-label">Identified Threats</label>
+                                        <select class="form-select" id="threats" multiple>
+                                            <option value="weeds">Weeds</option>
+                                            <option value="pests">Pests</option>
+                                            <option value="erosion">Erosion</option>
+                                            <option value="fire">Fire</option>
+                                            <option value="climate">Climate change</option>
+                                            <option value="development">Development</option>
+                                            <option value="recreation">Recreational impacts</option>
+                                            <option value="grazing">Grazing</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="assessmentPhotos" class="form-label">Upload Photos</label>
+                                        <input class="form-control" type="file" id="assessmentPhotos" multiple accept="image/*">
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary">Save Assessment</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Previous Assessments</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Assessor</th>
+                                                <th>Health Rating</th>
+                                                <th>Main Threats</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="assessmentsTableBody">
+                                            <!-- Assessments will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Maintenance Plan Tab -->
+                    <div class="tab-pane fade" id="maintenance-plan">
+                        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            <h1 class="h2">Maintenance Plan</h1>
+                            <div class="btn-toolbar mb-2 mb-md-0">
+                                <button type="button" class="btn btn-sm btn-success" id="newMaintenanceActivityBtn">
+                                    <i class="bi bi-plus"></i> New Activity
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Maintenance Activities</h5>
+                                <ul class="nav nav-tabs" id="maintenanceTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" type="button" role="tab">Upcoming</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed" type="button" role="tab">Completed</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="overdue-tab" data-bs-toggle="tab" data-bs-target="#overdue" type="button" role="tab">Overdue</button>
+                                    </li>
+                                </ul>
+                                <div class="tab-content p-3 border border-top-0 rounded-bottom">
+                                    <div class="tab-pane fade show active" id="upcoming" role="tabpanel">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Activity</th>
+                                                        <th>Type</th>
+                                                        <th>Scheduled</th>
+                                                        <th>Location</th>
+                                                        <th>Assigned To</th>
+                                                        <th>Status</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="upcomingActivitiesBody">
+                                                    <!-- Activities will be populated by JavaScript -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="completed" role="tabpanel">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Activity</th>
+                                                        <th>Type</th>
+                                                        <th>Completed</th>
+                                                        <th>Location</th>
+                                                        <th>Assigned To</th>
+                                                        <th>Status</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="completedActivitiesBody">
+                                                    <!-- Activities will be populated by JavaScript -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="overdue" role="tabpanel">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Activity</th>
+                                                        <th>Type</th>
+                                                        <th>Due Date</th>
+                                                        <th>Location</th>
+                                                        <th>Assigned To</th>
+                                                        <th>Status</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="overdueActivitiesBody">
+                                                    <!-- Activities will be populated by JavaScript -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mt-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Maintenance Calendar</h5>
+                                <div id="calendar" style="height: 600px;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Species Register Tab -->
+                    <div class="tab-pane fade" id="species-register">
+                        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            <h1 class="h2">Species Register</h1>
+                            <div class="btn-toolbar mb-2 mb-md-0">
+                                <div class="btn-group me-2">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary">Print</button>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-success" id="newSpeciesBtn">
+                                    <i class="bi bi-plus"></i> New Species
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row" id="speciesCardsContainer">
+                            <!-- Species cards will be populated by JavaScript -->
+                        </div>
+
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Species List</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Scientific Name</th>
+                                                <th>Common Name</th>
+                                                <th>Type</th>
+                                                <th>Status</th>
+                                                <th>Last Observed</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="speciesTableBody">
+                                            <!-- Species will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Monitoring Tab -->
+                    <div class="tab-pane fade" id="monitoring">
+                        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            <h1 class="h2">Monitoring</h1>
+                            <div class="btn-toolbar mb-2 mb-md-0">
+                                <button type="button" class="btn btn-sm btn-success" id="newMonitoringBtn">
+                                    <i class="bi bi-plus"></i> New Monitoring
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Fauna Monitoring</h5>
+                                        <canvas id="faunaChart" height="200"></canvas>
+                                        <div class="mt-3">
+                                            <button class="btn btn-sm btn-outline-primary me-2">Add Sighting</button>
+                                            <button class="btn btn-sm btn-outline-secondary">View All</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Vegetation Monitoring</h5>
+                                        <canvas id="vegetationChart" height="200"></canvas>
+                                        <div class="mt-3">
+                                            <button class="btn btn-sm btn-outline-primary me-2">Add Survey</button>
+                                            <button class="btn btn-sm btn-outline-secondary">View All</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mt-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Recent Monitoring Activities</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Type</th>
+                                                <th>Location</th>
+                                                <th>Observer</th>
+                                                <th>Findings</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="monitoringTableBody">
+                                            <!-- Monitoring activities will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reports Tab -->
+                    <div class="tab-pane fade" id="reports">
+                        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            <h1 class="h2">Reports</h1>
+                            <div class="btn-toolbar mb-2 mb-md-0">
+                                <button type="button" class="btn btn-sm btn-primary" id="generateReportBtn">
+                                    <i class="bi bi-file-earmark-plus"></i> Generate Report
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Compliance Report</h5>
+                                        <p class="card-text">Generate a report showing compliance with AHCECR301 requirements.</p>
+                                        <a href="#" class="btn btn-primary">Generate</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Maintenance Summary</h5>
+                                        <p class="card-text">Summary of all maintenance activities for a selected period.</p>
+                                        <a href="#" class="btn btn-primary">Generate</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Monitoring Summary</h5>
+                                        <p class="card-text">Summary of monitoring activities and findings.</p>
+                                        <a href="#" class="btn btn-primary">Generate</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Ecosystem Health Trend</h5>
+                                        <p class="card-text">Generate a trend report showing changes in ecosystem health over time.</p>
+                                        <a href="#" class="btn btn-primary">Generate</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Threat Management</h5>
+                                        <p class="card-text">Report on threats and management actions taken.</p>
+                                        <a href="#" class="btn btn-primary">Generate</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mt-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Previous Reports</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Report Type</th>
+                                                <th>Generated By</th>
+                                                <th>Period</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="reportsTableBody">
+                                            <!-- Reports will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Legislation Tab -->
+                    <div class="tab-pane fade" id="legislation">
+                        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            <h1 class="h2">Legislation & Compliance</h1>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Relevant Legislation</h5>
+                                <div class="accordion" id="legislationAccordion">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingOne">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                                Environment Protection and Biodiversity Conservation Act 1999 (EPBC Act)
+                                            </button>
+                                        </h2>
+                                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#legislationAccordion">
+                                            <div class="accordion-body">
+                                                <p>The EPBC Act is the Australian Government's central piece of environmental legislation. It provides a legal framework to protect and manage nationally and internationally important flora, fauna, ecological communities and heritage places.</p>
+                                                <p><strong>Key requirements:</strong></p>
+                                                <ul>
+                                                    <li>Identification and protection of threatened species and ecological communities</li>
+                                                    <li>Regulation of actions that may impact matters of national environmental significance</li>
+                                                    <li>Promotion of ecologically sustainable development</li>
+                                                </ul>
+                                                <a href="https://www.environment.gov.au/epbc" target="_blank" class="btn btn-sm btn-outline-primary">More Information</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingTwo">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                                                State/Territory Environmental Legislation
+                                            </button>
+                                        </h2>
+                                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#legislationAccordion">
+                                            <div class="accordion-body">
+                                                <p>Each state and territory has its own environmental protection and biodiversity conservation legislation that operates alongside the EPBC Act.</p>
+                                                <div class="table-responsive">
+                                                    <table class="table table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Jurisdiction</th>
+                                                                <th>Primary Legislation</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>NSW</td>
+                                                                <td>Biodiversity Conservation Act 2016</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>VIC</td>
+                                                                <td>Flora and Fauna Guarantee Act 1988</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>QLD</td>
+                                                                <td>Nature Conservation Act 1992</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>WA</td>
+                                                                <td>Biodiversity Conservation Act 2016</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>SA</td>
+                                                                <td>National Parks and Wildlife Act 1972</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>TAS</td>
+                                                                <td>Nature Conservation Act 2002</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>ACT</td>
+                                                                <td>Nature Conservation Act 2014</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>NT</td>
+                                                                <td>Territory Parks and Wildlife Conservation Act 2000</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingThree">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                                                Local Government Regulations
+                                            </button>
+                                        </h2>
+                                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#legislationAccordion">
+                                            <div class="accordion-body">
+                                                <p>Local governments often have additional planning schemes, local laws and policies that affect native ecosystem management.</p>
+                                                <p><strong>Common local regulations include:</strong></p>
+                                                <ul>
+                                                    <li>Tree preservation orders</li>
+                                                    <li>Vegetation clearing controls</li>
+                                                    <li>Weed control requirements</li>
+                                                    <li>Bushfire management provisions</li>
+                                                </ul>
+                                                <p>Check with your local council for specific requirements in your area.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mt-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Compliance Checklist</h5>
+                                <p>This checklist helps ensure your activities comply with relevant legislation and the requirements of AHCECR301.</p>
+                                
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Requirement</th>
+                                                <th>Compliant?</th>
+                                                <th>Evidence</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Identified all relevant legislation</td>
+                                                <td>
+                                                    <select class="form-select form-select-sm">
+                                                        <option>Yes</option>
+                                                        <option>No</option>
+                                                        <option>Partial</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control form-control-sm" placeholder="Document reference">
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary">Add Note</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Assessed impacts on protected matters</td>
+                                                <td>
+                                                    <select class="form-select form-select-sm">
+                                                        <option>Yes</option>
+                                                        <option selected>No</option>
+                                                        <option>Partial</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control form-control-sm" placeholder="Document reference">
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary">Add Note</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Obtained necessary permits/approvals</td>
+                                                <td>
+                                                    <select class="form-select form-select-sm">
+                                                        <option>Yes</option>
+                                                        <option selected>No</option>
+                                                        <option>Partial</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control form-control-sm" placeholder="Document reference">
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary">Add Note</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Implemented required protections</td>
+                                                <td>
+                                                    <select class="form-select form-select-sm">
+                                                        <option>Yes</option>
+                                                        <option selected>No</option>
+                                                        <option>Partial</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control form-control-sm" placeholder="Document reference">
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary">Add Note</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Maintained required records</td>
+                                                <td>
+                                                    <select class="form-select form-select-sm">
+                                                        <option>Yes</option>
+                                                        <option selected>No</option>
+                                                        <option>Partial</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control form-control-sm" placeholder="Document reference">
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary">Add Note</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <button class="btn btn-primary mt-3">Save Compliance Checklist</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Settings Tab -->
+                    <div class="tab-pane fade" id="settings">
+                        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            <h1 class="h2">Settings</h1>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">User Profile</h5>
+                                        <form>
+                                            <div class="mb-3">
+                                                <label for="userName" class="form-label">Full Name</label>
+                                                <input type="text" class="form-control" id="userName" value="John Doe">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="userEmail" class="form-label">Email</label>
+                                                <input type="email" class="form-control" id="userEmail" value="john.doe@example.com">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="userRole" class="form-label">Role</label>
+                                                <select class="form-select" id="userRole">
+                                                    <option>Administrator</option>
+                                                    <option selected>Ecologist</option>
+                                                    <option>Field Technician</option>
+                                                    <option>Volunteer</option>
+                                                </select>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Update Profile</button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <div class="card mt-4">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Change Password</h5>
+                                        <form>
+                                            <div class="mb-3">
+                                                <label for="currentPassword" class="form-label">Current Password</label>
+                                                <input type="password" class="form-control" id="currentPassword">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="newPassword" class="form-label">New Password</label>
+                                                <input type="password" class="form-control" id="newPassword">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                                                <input type="password" class="form-control" id="confirmPassword">
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Change Password</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Site Settings</h5>
+                                        <form>
+                                            <div class="mb-3">
+                                                <label for="siteName" class="form-label">Site Name</label>
+                                                <input type="text" class="form-control" id="siteName" value="Blue Mountains Conservation Area">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="siteLocation" class="form-label">Location</label>
+                                                <input type="text" class="form-control" id="siteLocation" value="NSW, Australia">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="siteArea" class="form-label">Area (hectares)</label>
+                                                <input type="number" class="form-control" id="siteArea" value="125">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="siteDescription" class="form-label">Description</label>
+                                                <textarea class="form-control" id="siteDescription" rows="3">Mixed eucalypt forest with significant biodiversity values including several threatened species.</textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Update Site Details</button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <div class="card mt-4">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Data Management</h5>
+                                        <div class="d-grid gap-2">
+                                            <button class="btn btn-outline-secondary">Export All Data</button>
+                                            <button class="btn btn-outline-secondary">Backup Database</button>
+                                            <button class="btn btn-outline-danger" id="resetDataBtn">Reset Test Data</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for adding new items -->
+    <div class="modal fade" id="addItemModal" tabindex="-1" aria-labelledby="addItemModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addItemModalLabel">Add New Item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalFormContainer">
+                    <!-- Form will be loaded here based on what we're adding -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveModalForm">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+<script>
+    // Global data structure with sample data
+    const appData = {
+        assessments: JSON.parse(localStorage.getItem('assessments')) || [
+            {
+                id: 1,
+                date: "2023-06-15",
+                assessor: "Jane Doe",
+                description: "Initial site assessment of the conservation area",
+                components: {
+                    flora: true,
+                    fauna: true,
+                    soil: true,
+                    water: true,
+                    geology: false,
+                    climate: true
+                },
+                health: "good",
+                threats: ["weeds", "erosion"],
+                timestamp: "2023-06-15T10:30:00Z"
+            },
+            {
+                id: 2,
+                date: "2023-03-02",
+                assessor: "John Smith",
+                description: "Quarterly ecosystem health check",
+                components: {
+                    flora: true,
+                    fauna: true,
+                    soil: true,
+                    water: false,
+                    geology: false,
+                    climate: true
+                },
+                health: "fair",
+                threats: ["weeds", "pests"],
+                timestamp: "2023-03-02T14:15:00Z"
+            }
+        ],
+        maintenanceActivities: JSON.parse(localStorage.getItem('maintenanceActivities')) || [
+            {
+                id: 1,
+                name: "Weed Control - Blackberry",
+                type: "Weed Management",
+                scheduledDate: "2023-06-25",
+                location: "Zone 3",
+                assignedTo: "John Smith",
+                status: "scheduled",
+                description: "Control blackberry infestation in Zone 3"
+            },
+            {
+                id: 2,
+                name: "Fauna Survey - Eastern Zone",
+                type: "Monitoring",
+                scheduledDate: "2023-06-28",
+                location: "Eastern Zone",
+                assignedTo: "Survey Team",
+                status: "scheduled",
+                description: "Quarterly fauna survey in eastern zone"
+            },
+            {
+                id: 3,
+                name: "Erosion Control - North Bank",
+                type: "Erosion Control",
+                scheduledDate: "2023-06-15",
+                completedDate: "2023-06-15",
+                location: "Northern Boundary",
+                assignedTo: "Grounds Team",
+                status: "completed",
+                description: "Install erosion controls on north bank"
+            }
+        ],
+        species: JSON.parse(localStorage.getItem('species')) || [
+            {
+                id: 1,
+                scientificName: "Eucalyptus pauciflora",
+                commonName: "Snow Gum",
+                type: "flora",
+                status: "native",
+                lastObserved: "2023-06-15",
+                description: "Dominant tree species in the area"
+            },
+            {
+                id: 2,
+                scientificName: "Rubus fruticosus",
+                commonName: "Blackberry",
+                type: "flora",
+                status: "weed",
+                lastObserved: "2023-06-10",
+                description: "Invasive weed species, high priority for control"
+            },
+            {
+                id: 3,
+                scientificName: "Phascolarctos cinereus",
+                commonName: "Koala",
+                type: "fauna",
+                status: "endangered",
+                lastObserved: "2023-06-05",
+                description: "Occasional sightings in the conservation area"
+            }
+        ],
+        monitoring: JSON.parse(localStorage.getItem('monitoring')) || [
+            {
+                id: 1,
+                date: "2023-06-15",
+                type: "vegetation",
+                location: "Zone 1",
+                observer: "Jane Doe",
+                findings: "Increased native cover compared to last survey",
+                species: ["Eucalyptus pauciflora"]
+            },
+            {
+                id: 2,
+                date: "2023-06-12",
+                type: "fauna",
+                location: "Eastern Zone",
+                observer: "Survey Team",
+                findings: "Koala sighting near creek line",
+                species: ["Phascolarctos cinereus"]
+            }
+        ],
+        reports: JSON.parse(localStorage.getItem('reports')) || [
+            {
+                id: 1,
+                date: "2023-06-01",
+                type: "monthly-maintenance",
+                generatedBy: "Jane Doe",
+                period: "May 2023",
+                content: "Monthly maintenance report for May 2023"
+            },
+            {
+                id: 2,
+                date: "2023-05-01",
+                type: "monthly-maintenance",
+                generatedBy: "Jane Doe",
+                period: "April 2023",
+                content: "Monthly maintenance report for April 2023"
+            }
+        ]
+    };
+
+    // Current item being edited/added
+    let currentItemType = null;
+    let currentItemId = null;
+
+    // Save data to localStorage
+    function saveData() {
+        localStorage.setItem('assessments', JSON.stringify(appData.assessments));
+        localStorage.setItem('maintenanceActivities', JSON.stringify(appData.maintenanceActivities));
+        localStorage.setItem('species', JSON.stringify(appData.species));
+        localStorage.setItem('monitoring', JSON.stringify(appData.monitoring));
+        localStorage.setItem('reports', JSON.stringify(appData.reports));
+        updateAllDisplays();
+    }
+
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize charts
+        initCharts();
+        
+        // Initialize the map
+        initMap();
+        
+        // Set up event listeners
+        setupEventListeners();
+        
+        // Update all displays with current data
+        updateAllDisplays();
+    });
+
+    function initCharts() {
+        // Health chart
+        const healthCtx = document.getElementById('healthChart').getContext('2d');
+        const healthChart = new Chart(healthCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Native Vegetation', 'Weed Cover', 'Erosion', 'Other'],
+                datasets: [{
+                    data: [78, 22, 15, 5],
+                    backgroundColor: [
+                        '#28a745',
+                        '#dc3545',
+                        '#fd7e14',
+                        '#6c757d'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Fauna chart
+        const faunaCtx = document.getElementById('faunaChart').getContext('2d');
+        const faunaChart = new Chart(faunaCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Fauna Observations',
+                    data: [12, 19, 15, 17, 21, 23],
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Vegetation chart
+        const vegetationCtx = document.getElementById('vegetationChart').getContext('2d');
+        const vegetationChart = new Chart(vegetationCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Native Vegetation Cover (%)',
+                    data: [65, 67, 68, 72, 75, 78],
+                    fill: false,
+                    backgroundColor: 'rgba(40, 167, 69, 0.6)',
+                    borderColor: 'rgba(40, 167, 69, 1)',
+                    tension: 0.1,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 50,
+                        max: 100
+                    }
+                }
+            }
+        });
+    }
+
+    function initMap() {
+        const map = L.map('map').setView([-33.8688, 151.2093], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Add some sample markers
+        L.marker([-33.8688, 151.2093]).addTo(map)
+            .bindPopup('Main Conservation Area')
+            .openPopup();
+            
+        L.marker([-33.871, 151.207]).addTo(map)
+            .bindPopup('Zone 1 - Native Vegetation');
+            
+        L.marker([-33.866, 151.211]).addTo(map)
+            .bindPopup('Zone 2 - Weed Control Area');
+    }
+
+    function setupEventListeners() {
+        // Site assessment form
+        document.getElementById('assessmentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveAssessment();
+        });
+
+        // New item buttons
+        document.getElementById('newActivityBtn').addEventListener('click', () => showAddForm('activity'));
+        document.getElementById('newSpeciesBtn').addEventListener('click', () => showAddForm('species'));
+        document.getElementById('newMonitoringBtn').addEventListener('click', () => showAddForm('monitoring'));
+        document.getElementById('generateReportBtn').addEventListener('click', () => showAddForm('report'));
+
+        // Save modal form
+        document.getElementById('saveModalForm').addEventListener('click', saveModalForm);
+
+        // Reset data button
+        document.getElementById('resetDataBtn').addEventListener('click', resetData);
+    }
+
+    function showAddForm(itemType) {
+        currentItemType = itemType;
+        currentItemId = null;
+        
+        const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
+        const modalTitle = document.getElementById('addItemModalLabel');
+        const formContainer = document.getElementById('modalFormContainer');
+        
+        switch(itemType) {
+            case 'activity':
+                modalTitle.textContent = 'Add New Maintenance Activity';
+                formContainer.innerHTML = `
+                    <div class="mb-3">
+                        <label for="activityName" class="form-label">Activity Name</label>
+                        <input type="text" class="form-control" id="activityName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="activityType" class="form-label">Activity Type</label>
+                        <select class="form-select" id="activityType" required>
+                            <option value="Weed Management">Weed Management</option>
+                            <option value="Monitoring">Monitoring</option>
+                            <option value="Erosion Control">Erosion Control</option>
+                            <option value="Rehabilitation">Rehabilitation</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="activityDate" class="form-label">Scheduled Date</label>
+                        <input type="date" class="form-control" id="activityDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="activityLocation" class="form-label">Location</label>
+                        <input type="text" class="form-control" id="activityLocation" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="activityAssigned" class="form-label">Assigned To</label>
+                        <input type="text" class="form-control" id="activityAssigned" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="activityDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="activityDescription" rows="3"></textarea>
+                    </div>
+                `;
+                break;
+                
+            case 'species':
+                modalTitle.textContent = 'Add New Species';
+                formContainer.innerHTML = `
+                    <div class="mb-3">
+                        <label for="speciesScientific" class="form-label">Scientific Name</label>
+                        <input type="text" class="form-control" id="speciesScientific" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="speciesCommon" class="form-label">Common Name</label>
+                        <input type="text" class="form-control" id="speciesCommon">
+                    </div>
+                    <div class="mb-3">
+                        <label for="speciesType" class="form-label">Type</label>
+                        <select class="form-select" id="speciesType" required>
+                            <option value="flora">Flora</option>
+                            <option value="fauna">Fauna</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="speciesStatus" class="form-label">Status</label>
+                        <select class="form-select" id="speciesStatus" required>
+                            <option value="native">Native</option>
+                            <option value="weed">Weed</option>
+                            <option value="endangered">Endangered</option>
+                            <option value="vulnerable">Vulnerable</option>
+                            <option value="introduced">Introduced</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="speciesLastObserved" class="form-label">Last Observed</label>
+                        <input type="date" class="form-control" id="speciesLastObserved">
+                    </div>
+                    <div class="mb-3">
+                        <label for="speciesDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="speciesDescription" rows="3"></textarea>
+                    </div>
+                `;
+                break;
+                
+            case 'monitoring':
+                modalTitle.textContent = 'Add New Monitoring Record';
+                formContainer.innerHTML = `
+                    <div class="mb-3">
+                        <label for="monitoringDate" class="form-label">Date</label>
+                        <input type="date" class="form-control" id="monitoringDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="monitoringType" class="form-label">Type</label>
+                        <select class="form-select" id="monitoringType" required>
+                            <option value="vegetation">Vegetation Survey</option>
+                            <option value="fauna">Fauna Survey</option>
+                            <option value="water">Water Quality</option>
+                            <option value="weeds">Weed Mapping</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="monitoringLocation" class="form-label">Location</label>
+                        <input type="text" class="form-control" id="monitoringLocation" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="monitoringObserver" class="form-label">Observer</label>
+                        <input type="text" class="form-control" id="monitoringObserver" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="monitoringFindings" class="form-label">Findings</label>
+                        <textarea class="form-control" id="monitoringFindings" rows="3" required></textarea>
+                    </div>
+                `;
+                break;
+                
+            case 'report':
+                modalTitle.textContent = 'Generate New Report';
+                formContainer.innerHTML = `
+                    <div class="mb-3">
+                        <label for="reportType" class="form-label">Report Type</label>
+                        <select class="form-select" id="reportType" required>
+                            <option value="compliance">Compliance Report</option>
+                            <option value="maintenance">Maintenance Summary</option>
+                            <option value="monitoring">Monitoring Summary</option>
+                            <option value="health">Ecosystem Health Trend</option>
+                            <option value="threats">Threat Management</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reportPeriod" class="form-label">Period</label>
+                        <input type="text" class="form-control" id="reportPeriod" placeholder="e.g. June 2023 or Q2 2023" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reportContent" class="form-label">Notes</label>
+                        <textarea class="form-control" id="reportContent" rows="3"></textarea>
+                    </div>
+                `;
+                break;
+        }
+        
+        modal.show();
+    }
+
+    function saveModalForm() {
+        switch(currentItemType) {
+            case 'activity':
+                const activity = {
+                    id: currentItemId || Date.now(),
+                    name: document.getElementById('activityName').value,
+                    type: document.getElementById('activityType').value,
+                    scheduledDate: document.getElementById('activityDate').value,
+                    location: document.getElementById('activityLocation').value,
+                    assignedTo: document.getElementById('activityAssigned').value,
+                    status: 'scheduled',
+                    description: document.getElementById('activityDescription').value,
+                    timestamp: new Date().toISOString()
+                };
+                
+                if (currentItemId) {
+                    // Update existing activity
+                    const index = appData.maintenanceActivities.findIndex(a => a.id === currentItemId);
+                    if (index !== -1) {
+                        appData.maintenanceActivities[index] = activity;
+                    }
+                } else {
+                    // Add new activity
+                    appData.maintenanceActivities.push(activity);
+                }
+                break;
+                
+            case 'species':
+                const species = {
+                    id: currentItemId || Date.now(),
+                    scientificName: document.getElementById('speciesScientific').value,
+                    commonName: document.getElementById('speciesCommon').value,
+                    type: document.getElementById('speciesType').value,
+                    status: document.getElementById('speciesStatus').value,
+                    lastObserved: document.getElementById('speciesLastObserved').value || new Date().toISOString().split('T')[0],
+                    description: document.getElementById('speciesDescription').value,
+                    timestamp: new Date().toISOString()
+                };
+                
+                if (currentItemId) {
+                    // Update existing species
+                    const index = appData.species.findIndex(s => s.id === currentItemId);
+                    if (index !== -1) {
+                        appData.species[index] = species;
+                    }
+                } else {
+                    // Add new species
+                    appData.species.push(species);
+                }
+                break;
+                
+            case 'monitoring':
+                const monitoring = {
+                    id: currentItemId || Date.now(),
+                    date: document.getElementById('monitoringDate').value,
+                    type: document.getElementById('monitoringType').value,
+                    location: document.getElementById('monitoringLocation').value,
+                    observer: document.getElementById('monitoringObserver').value,
+                    findings: document.getElementById('monitoringFindings').value,
+                    species: [],
+                    timestamp: new Date().toISOString()
+                };
+                
+                if (currentItemId) {
+                    // Update existing monitoring
+                    const index = appData.monitoring.findIndex(m => m.id === currentItemId);
+                    if (index !== -1) {
+                        appData.monitoring[index] = monitoring;
+                    }
+                } else {
+                    // Add new monitoring
+                    appData.monitoring.push(monitoring);
+                }
+                break;
+                
+            case 'report':
+                const report = {
+                    id: currentItemId || Date.now(),
+                    date: new Date().toISOString().split('T')[0],
+                    type: document.getElementById('reportType').value,
+                    generatedBy: "Current User",
+                    period: document.getElementById('reportPeriod').value,
+                    content: document.getElementById('reportContent').value,
+                    timestamp: new Date().toISOString()
+                };
+                
+                if (currentItemId) {
+                    // Update existing report
+                    const index = appData.reports.findIndex(r => r.id === currentItemId);
+                    if (index !== -1) {
+                        appData.reports[index] = report;
+                    }
+                } else {
+                    // Add new report
+                    appData.reports.push(report);
+                }
+                break;
+        }
+        
+        saveData();
+        bootstrap.Modal.getInstance(document.getElementById('addItemModal')).hide();
+    }
+
+    function saveAssessment() {
+        const assessment = {
+            id: Date.now(),
+            date: document.getElementById('assessmentDate').value,
+            assessor: document.getElementById('assessorName').value,
+            description: document.getElementById('siteDescription').value,
+            components: {
+                flora: document.getElementById('flora').checked,
+                fauna: document.getElementById('fauna').checked,
+                soil: document.getElementById('soil').checked,
+                water: document.getElementById('water').checked,
+                geology: document.getElementById('geology').checked,
+                climate: document.getElementById('climate').checked
+            },
+            health: document.getElementById('ecosystemHealth').value,
+            threats: Array.from(document.getElementById('threats').selectedOptions).map(o => o.value),
+            photos: [], // Would need file handling for real implementation
+            timestamp: new Date().toISOString()
+        };
+        
+        appData.assessments.push(assessment);
+        saveData();
+        
+        // Reset form
+        document.getElementById('assessmentForm').reset();
+        
+        // Show success message
+        alert('Assessment saved successfully!');
+    }
+
+    function resetData() {
+        if (confirm('Are you sure you want to reset all data to the default sample data? This cannot be undone.')) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+
+    function updateAllDisplays() {
+        updateDashboard();
+        updateAssessmentsTable();
+        updateMaintenanceTables();
+        updateSpeciesDisplay();
+        updateMonitoringDisplay();
+        updateReportsDisplay();
+    }
+
+    function updateDashboard() {
+        // Update upcoming tasks
+        const upcomingTasksList = document.getElementById('upcomingTasksList');
+        upcomingTasksList.innerHTML = '';
+        
+        const upcomingTasks = appData.maintenanceActivities
+            .filter(a => a.status === 'scheduled' && new Date(a.scheduledDate) > new Date())
+            .sort((a, b) => new Date(a.scheduledDate) - new Date(b.scheduledDate))
+            .slice(0, 3);
+            
+        upcomingTasks.forEach(task => {
+            const taskItem = document.createElement('a');
+            taskItem.className = 'list-group-item list-group-item-action';
+            taskItem.innerHTML = `
+                <div class="d-flex w-100 justify-content-between">
+                    <h6 class="mb-1">${task.name}</h6>
+                    <small class="text-muted">${new Date(task.scheduledDate).toLocaleDateString()}</small>
+                </div>
+                <p class="mb-1">${task.description || 'No description'}</p>
+                <small class="text-muted">Assigned to: ${task.assignedTo}</small>
+            `;
+            upcomingTasksList.appendChild(taskItem);
+        });
+
+        // Update recent observations
+        const observationsList = document.getElementById('recentObservationsList');
+        observationsList.innerHTML = '';
+        
+        const recentObservations = [...appData.monitoring]
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .slice(0, 4);
+            
+        recentObservations.forEach(obs => {
+            const obsItem = document.createElement('li');
+            obsItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+            
+            let observationText = obs.findings;
+            if (obs.type === 'fauna' && obs.species && obs.species.length > 0) {
+                const speciesNames = obs.species.map(speciesId => {
+                    const species = appData.species.find(s => s.id === speciesId);
+                    return species ? species.commonName || species.scientificName : '';
+                }).filter(name => name);
+                
+                if (speciesNames.length > 0) {
+                    observationText = `${speciesNames.join(', ')} sighting`;
+                }
+            }
+            
+            obsItem.innerHTML = `
+                ${observationText}
+                <span class="badge ${getStatusBadgeClass(obs.type)} rounded-pill">
+                    ${obs.type === 'fauna' ? 'Fauna' : obs.type === 'vegetation' ? 'Flora' : obs.type.charAt(0).toUpperCase() + obs.type.slice(1)}
+                </span>
+            `;
+            observationsList.appendChild(obsItem);
+        });
+    }
+
+    function updateAssessmentsTable() {
+        const tbody = document.getElementById('assessmentsTableBody');
+        tbody.innerHTML = '';
+        
+        appData.assessments.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        appData.assessments.forEach(assess => {
+            const healthBadgeClass = {
+                'excellent': 'bg-success',
+                'good': 'bg-primary',
+                'fair': 'bg-warning',
+                'poor': 'bg-danger',
+                'degraded': 'bg-dark'
+            }[assess.health] || 'bg-secondary';
+            
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${new Date(assess.date).toLocaleDateString()}</td>
+                <td>${assess.assessor}</td>
+                <td><span class="badge ${healthBadgeClass}">${assess.health.charAt(0).toUpperCase() + assess.health.slice(1)}</span></td>
+                <td>${assess.threats.join(', ')}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary view-assessment" data-id="${assess.id}">View</button>
+                    <button class="btn btn-sm btn-outline-secondary">PDF</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    function updateMaintenanceTables() {
+        const upcomingTbody = document.getElementById('upcomingActivitiesBody');
+        const completedTbody = document.getElementById('completedActivitiesBody');
+        const overdueTbody = document.getElementById('overdueActivitiesBody');
+        
+        upcomingTbody.innerHTML = '';
+        completedTbody.innerHTML = '';
+        overdueTbody.innerHTML = '';
+        
+        appData.maintenanceActivities.forEach(activity => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${activity.name}</td>
+                <td>${activity.type}</td>
+                <td>${new Date(activity.scheduledDate).toLocaleDateString()}</td>
+                <td>${activity.location}</td>
+                <td>${activity.assignedTo}</td>
+                <td><span class="badge ${getStatusBadgeClass(activity.status)}">${activity.status.charAt(0).toUpperCase() + activity.status.slice(1)}</span></td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary edit-activity" data-id="${activity.id}">Details</button>
+                    ${activity.status === 'completed' ? '<button class="btn btn-sm btn-outline-secondary">Report</button>' : ''}
+                </td>
+            `;
+            
+            if (activity.status === 'completed') {
+                completedTbody.appendChild(row);
+            } else if (new Date(activity.scheduledDate) < new Date()) {
+                overdueTbody.appendChild(row);
+            } else {
+                upcomingTbody.appendChild(row);
+            }
+        });
+    }
+
+    function updateSpeciesDisplay() {
+        // Update cards
+        const speciesCardsContainer = document.getElementById('speciesCardsContainer');
+        speciesCardsContainer.innerHTML = '';
+        
+        // Show first 3 species as cards
+        appData.species.slice(0, 3).forEach(species => {
+            const statusBadgeClass = {
+                'native': 'bg-success',
+                'weed': 'bg-danger',
+                'endangered': 'bg-danger',
+                'vulnerable': 'bg-warning',
+                'introduced': 'bg-info'
+            }[species.status] || 'bg-secondary';
+            
+            const cardCol = document.createElement('div');
+            cardCol.className = 'col-md-4 mb-4';
+            cardCol.innerHTML = `
+                <div class="card h-100 species-card">
+                    <img src="https://via.placeholder.com/300x200?text=${encodeURIComponent(species.scientificName)}" class="card-img-top" alt="Species image">
+                    <div class="card-body">
+                        <h5 class="card-title">${species.scientificName}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">${species.commonName || 'No common name'}</h6>
+                        <p class="card-text">
+                            <span class="badge ${statusBadgeClass} me-1">${species.status.charAt(0).toUpperCase() + species.status.slice(1)}</span>
+                        </p>
+                        <p class="card-text"><small>Last observed: ${new Date(species.lastObserved).toLocaleDateString()}</small></p>
+                        <button class="btn btn-sm btn-outline-primary edit-species" data-id="${species.id}">View Details</button>
+                    </div>
+                </div>
+            `;
+            speciesCardsContainer.appendChild(cardCol);
+        });
+        
+        // Update table
+        const speciesTbody = document.getElementById('speciesTableBody');
+        speciesTbody.innerHTML = '';
+        
+        appData.species.forEach(species => {
+            const statusBadgeClass = {
+                'native': 'bg-success',
+                'weed': 'bg-danger',
+                'endangered': 'bg-danger',
+                'vulnerable': 'bg-warning',
+                'introduced': 'bg-info'
+            }[species.status] || 'bg-secondary';
+            
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${species.scientificName}</td>
+                <td>${species.commonName || '-'}</td>
+                <td>${species.type.charAt(0).toUpperCase() + species.type.slice(1)}</td>
+                <td><span class="badge ${statusBadgeClass}">${species.status.charAt(0).toUpperCase() + species.status.slice(1)}</span></td>
+                <td>${new Date(species.lastObserved).toLocaleDateString()}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary edit-species" data-id="${species.id}">View</button>
+                    ${species.status === 'weed' ? '<button class="btn btn-sm btn-outline-warning">Control</button>' : '<button class="btn btn-sm btn-outline-info">Monitor</button>'}
+                </td>
+            `;
+            speciesTbody.appendChild(row);
+        });
+    }
+
+    function updateMonitoringDisplay() {
+        const monitoringTbody = document.getElementById('monitoringTableBody');
+        monitoringTbody.innerHTML = '';
+        
+        appData.monitoring.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        appData.monitoring.forEach(record => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${new Date(record.date).toLocaleDateString()}</td>
+                <td>${record.type.charAt(0).toUpperCase() + record.type.slice(1)} Survey</td>
+                <td>${record.location}</td>
+                <td>${record.observer}</td>
+                <td>${record.findings}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary edit-monitoring" data-id="${record.id}">View</button>
+                    <button class="btn btn-sm btn-outline-secondary">Report</button>
+                </td>
+            `;
+            monitoringTbody.appendChild(row);
+        });
+    }
+
+    function updateReportsDisplay() {
+        const reportsTbody = document.getElementById('reportsTableBody');
+        reportsTbody.innerHTML = '';
+        
+        appData.reports.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        appData.reports.forEach(report => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${new Date(report.date).toLocaleDateString()}</td>
+                <td>${report.type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</td>
+                <td>${report.generatedBy}</td>
+                <td>${report.period}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary">View</button>
+                    <button class="btn btn-sm btn-outline-secondary">PDF</button>
+                </td>
+            `;
+            reportsTbody.appendChild(row);
+        });
+    }
+
+    function getStatusBadgeClass(status) {
+        return {
+            'scheduled': 'bg-info',
+            'in-progress': 'bg-primary',
+            'completed': 'bg-success',
+            'overdue': 'bg-danger',
+            'fauna': 'bg-primary',
+            'vegetation': 'bg-success',
+            'water': 'bg-info',
+            'weeds': 'bg-danger'
+        }[status] || 'bg-secondary';
+    }
+</script>
+</body>
+</html>
