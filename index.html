@@ -126,6 +126,12 @@
             border: 1px solid #ddd;
             border-radius: 4px;
         }
+        .fc-event-title {
+            white-space: normal;
+        }
+        .fc-daygrid-event-dot {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -1580,7 +1586,7 @@
         // Initialize map
         function initMap() {
             // Initialize the map
-            window.map = L.map('map').setView([-41.0558, 145.9038], 14); // Burnie, Tasmania coordinates and zoom level
+            window.map = L.map('map').setView([-33.4000, 150.3000], 13); // Blue Mountains coordinates and zoom level
 
             // Add OpenStreetMap tiles
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -1588,30 +1594,30 @@
             }).addTo(window.map);
 
             // Add a marker for the default location
-            const marker = L.marker([-41.0558, 145.9038]).addTo(window.map)
-                .bindPopup('Burnie, Tasmania')
+            const marker = L.marker([-33.4000, 150.3000]).addTo(window.map)
+                .bindPopup('Blue Mountains Conservation Area')
                 .openPopup();
 
             // Add some sample zones (polygons)
             const zone1 = L.polygon([
-                [-41.05, 145.90],
-                [-41.05, 145.91],
-                [-41.06, 145.91],
-                [-41.06, 145.90]
+                [-33.41, 150.29],
+                [-33.41, 150.31],
+                [-33.39, 150.31],
+                [-33.39, 150.29]
             ], {color: 'blue', fillOpacity: 0.2}).addTo(window.map).bindPopup('Zone 1 - Native Forest');
 
             const zone2 = L.polygon([
-                [-41.04, 145.905],
-                [-41.04, 145.915],
-                [-41.05, 145.915],
-                [-41.05, 145.905]
+                [-33.42, 150.305],
+                [-33.42, 150.315],
+                [-33.40, 150.315],
+                [-33.40, 150.305]
             ], {color: 'green', fillOpacity: 0.2}).addTo(window.map).bindPopup('Zone 2 - Wetland Area');
 
             const zone3 = L.polygon([
-                [-41.06, 145.895],
-                [-41.06, 145.905],
-                [-41.07, 145.905],
-                [-41.07, 145.895]
+                [-33.38, 150.295],
+                [-33.38, 150.305],
+                [-33.36, 150.305],
+                [-33.36, 150.295]
             ], {color: 'red', fillOpacity: 0.2}).addTo(window.map).bindPopup('Zone 3 - Weed Control Area');
 
             // Create layer groups for different map features
@@ -1620,19 +1626,19 @@
             window.weedsLayer = L.layerGroup();
 
             // Add some sample vegetation points
-            L.marker([-41.055, 145.902]).addTo(window.vegetationLayer)
+            L.marker([-33.405, 150.302]).addTo(window.vegetationLayer)
                 .bindPopup('Eucalyptus pauciflora (Snow Gum)');
-            L.marker([-41.054, 145.904]).addTo(window.vegetationLayer)
+            L.marker([-33.404, 150.304]).addTo(window.vegetationLayer)
                 .bindPopup('Acacia melanoxylon (Blackwood)');
-            L.marker([-41.056, 145.901]).addTo(window.vegetationLayer)
+            L.marker([-33.406, 150.301]).addTo(window.vegetationLayer)
                 .bindPopup('Banksia marginata (Silver Banksia)');
 
             // Add some sample weed points
-            L.marker([-41.065, 145.901]).addTo(window.weedsLayer)
+            L.marker([-33.365, 150.301]).addTo(window.weedsLayer)
                 .bindPopup('Rubus fruticosus (Blackberry)');
-            L.marker([-41.064, 145.903]).addTo(window.weedsLayer)
+            L.marker([-33.364, 150.303]).addTo(window.weedsLayer)
                 .bindPopup('Lantana camara (Lantana)');
-            L.marker([-41.066, 145.902]).addTo(window.weedsLayer)
+            L.marker([-33.366, 150.302]).addTo(window.weedsLayer)
                 .bindPopup('Ulex europaeus (Gorse)');
 
             // Add layer control
@@ -1717,6 +1723,22 @@
                     if (activity) {
                         showActivityDetails(activity);
                     }
+                },
+                eventContent: function(arg) {
+                    // Customize event display to show type and location
+                    const type = arg.event.extendedProps.type;
+                    const location = arg.event.extendedProps.location;
+                    
+                    const eventEl = document.createElement('div');
+                    eventEl.className = 'fc-event-main-frame';
+                    
+                    const titleEl = document.createElement('div');
+                    titleEl.className = 'fc-event-title';
+                    titleEl.innerHTML = `<strong>${arg.event.title}</strong><br>${formatActivityType(type)} - ${location}`;
+                    
+                    eventEl.appendChild(titleEl);
+                    
+                    return { domNodes: [eventEl] };
                 }
             });
             window.calendar.render();
@@ -1786,6 +1808,7 @@
                             ${obs.type === 'fauna-survey' ? 'Fauna' : 'Flora'}
                         </span>
                     `;
+                    obsEl.addEventListener('click', () => showMonitoringDetails(obs));
                     recentObservationsList.appendChild(obsEl);
                 });
             }
@@ -1885,7 +1908,12 @@
             const speciesTable = document.getElementById('speciesTable').getElementsByTagName('tbody')[0];
             speciesTable.innerHTML = '';
             
+            // Populate monitoring species dropdown
+            const monitoringSpeciesSelect = document.getElementById('monitoringSpecies');
+            monitoringSpeciesSelect.innerHTML = '';
+            
             db.species.forEach(species => {
+                // Add to table
                 const row = speciesTable.insertRow();
                 row.innerHTML = `
                     <td>${species.scientificName}</td>
@@ -1902,6 +1930,12 @@
                                 '<button class="btn btn-sm btn-outline-secondary map-species" data-id="${species.id}">Map</button>')}
                     </td>
                 `;
+                
+                // Add to monitoring species dropdown
+                const option = document.createElement('option');
+                option.value = species.id;
+                option.textContent = `${species.scientificName}${species.commonName ? ` (${species.commonName})` : ''}`;
+                monitoringSpeciesSelect.appendChild(option);
             });
             
             // Add event listeners to species buttons
@@ -2631,6 +2665,8 @@
                 date: new Date().toISOString(),
                 generatedBy: db.settings.userProfile.name,
                 content: {
+                    title: 'Compliance Report',
+                    body: 'This report shows compliance with AHCECR301 requirements.',
                     progress: progressPercentage,
                     checklist: db.complianceChecklist,
                     summary: `Compliance progress: ${progressPercentage}% complete`
@@ -2774,6 +2810,11 @@
                     </div>
                 </div>
                 ` : ''}
+                
+                <div class="mb-3">
+                    <h6>Record Created</h6>
+                    <p>${formatDateTime(assessment.createdAt)}</p>
+                </div>
             `;
             
             const modal = new bootstrap.Modal(document.getElementById('viewAssessmentModal'));
