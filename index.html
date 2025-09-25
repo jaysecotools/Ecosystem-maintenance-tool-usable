@@ -283,8 +283,8 @@
                             <h1 class="h2">Native Ecosystem Maintenance Dashboard</h1>
                             <div class="btn-toolbar mb-2 mb-md-0">
                                 <div class="btn-group me-2">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary">Print</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="exportDashboard">Export</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="printDashboard">Print</button>
                                 </div>
                                 <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#newActivityModal">
                                     <i class="bi bi-plus"></i> New Activity
@@ -410,7 +410,7 @@
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title">New Site Assessment</h5>
-                                <form id="assessmentForm">
+                                <form id="newAssessmentForm">
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="assessmentDate" class="form-label">Assessment Date *</label>
@@ -1206,7 +1206,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="assessmentForm">
+                    <form id="newAssessmentForm">
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="assessmentDate" class="form-label">Assessment Date *</label>
@@ -1467,6 +1467,158 @@
         </div>
     </div>
 
+    <!-- New Fauna Sighting Modal -->
+    <div class="modal fade" id="newFaunaSightingModal" tabindex="-1" aria-labelledby="newFaunaSightingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newFaunaSightingModalLabel">New Fauna Sighting</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="faunaSightingForm">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="faunaSpecies" class="form-label">Species *</label>
+                                <select class="form-select" id="faunaSpecies" required>
+                                    <option value="" selected disabled>Select species...</option>
+                                    <!-- Species options will be loaded here dynamically -->
+                                </select>
+                                <div class="invalid-feedback">Please select a species.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="faunaDate" class="form-label">Date *</label>
+                                <input type="date" class="form-control" id="faunaDate" required>
+                                <div class="invalid-feedback">Please provide a date.</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="faunaLocation" class="form-label">Location *</label>
+                            <input type="text" class="form-control" id="faunaLocation" required>
+                            <div class="invalid-feedback">Please provide a location.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="faunaObserver" class="form-label">Observer *</label>
+                            <input type="text" class="form-control" id="faunaObserver" required>
+                            <div class="invalid-feedback">Please specify the observer.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="faunaCount" class="form-label">Count</label>
+                            <input type="number" class="form-control" id="faunaCount" min="1" value="1">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="faunaBehavior" class="form-label">Behavior/Observations</label>
+                            <textarea class="form-control" id="faunaBehavior" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="faunaPhotos" class="form-label">Upload Photos</label>
+                            <input class="form-control" type="file" id="faunaPhotos" multiple accept="image/*">
+                            <div class="image-preview-container" id="faunaPhotoPreview"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="faunaNotes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="faunaNotes" rows="2"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveFaunaSighting">Save Sighting</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Vegetation Survey Modal -->
+    <div class="modal fade" id="newVegetationSurveyModal" tabindex="-1" aria-labelledby="newVegetationSurveyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newVegetationSurveyModalLabel">New Vegetation Survey</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="vegetationSurveyForm">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="vegetationDate" class="form-label">Date *</label>
+                                <input type="date" class="form-control" id="vegetationDate" required>
+                                <div class="invalid-feedback">Please provide a date.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="vegetationObserver" class="form-label">Observer *</label>
+                                <input type="text" class="form-control" id="vegetationObserver" required>
+                                <div class="invalid-feedback">Please specify the observer.</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="vegetationLocation" class="form-label">Location *</label>
+                            <input type="text" class="form-control" id="vegetationLocation" required>
+                            <div class="invalid-feedback">Please provide a location.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="vegetationSpecies" class="form-label">Species Observed</label>
+                            <select class="form-select" id="vegetationSpecies" multiple>
+                                <!-- Species options will be loaded here dynamically -->
+                            </select>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="vegetationCover" class="form-label">Native Cover (%)</label>
+                                <input type="number" class="form-control" id="vegetationCover" min="0" max="100" step="1">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="vegetationWeedCover" class="form-label">Weed Cover (%)</label>
+                                <input type="number" class="form-control" id="vegetationWeedCover" min="0" max="100" step="1">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="vegetationHealth" class="form-label">Health Rating</label>
+                                <select class="form-select" id="vegetationHealth">
+                                    <option value="" selected disabled>Select rating...</option>
+                                    <option value="excellent">Excellent</option>
+                                    <option value="good">Good</option>
+                                    <option value="fair">Fair</option>
+                                    <option value="poor">Poor</option>
+                                    <option value="degraded">Degraded</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="vegetationFindings" class="form-label">Findings *</label>
+                            <textarea class="form-control" id="vegetationFindings" rows="3" required></textarea>
+                            <div class="invalid-feedback">Please provide findings.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="vegetationPhotos" class="form-label">Upload Photos</label>
+                            <input class="form-control" type="file" id="vegetationPhotos" multiple accept="image/*">
+                            <div class="image-preview-container" id="vegetationPhotoPreview"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="vegetationNotes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="vegetationNotes" rows="2"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveVegetationSurvey">Save Survey</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- View Assessment Modal -->
     <div class="modal fade" id="viewAssessmentModal" tabindex="-1" aria-labelledby="viewAssessmentModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -1649,6 +1801,8 @@
             activities: JSON.parse(localStorage.getItem('activities')) || [],
             monitoring: JSON.parse(localStorage.getItem('monitoring')) || [],
             reports: JSON.parse(localStorage.getItem('reports')) || [],
+            faunaSightings: JSON.parse(localStorage.getItem('faunaSightings')) || [],
+            vegetationSurveys: JSON.parse(localStorage.getItem('vegetationSurveys')) || [],
             complianceChecklist: JSON.parse(localStorage.getItem('complianceChecklist')) || [
                 { id: 1, requirement: "Identified all relevant legislation", compliant: "", evidence: "", notes: "" },
                 { id: 2, requirement: "Assessed impacts on protected matters", compliant: "", evidence: "", notes: "" },
@@ -1671,13 +1825,22 @@
 
         // Save data to localStorage
         function saveData() {
-            localStorage.setItem('assessments', JSON.stringify(db.assessments));
-            localStorage.setItem('species', JSON.stringify(db.species));
-            localStorage.setItem('activities', JSON.stringify(db.activities));
-            localStorage.setItem('monitoring', JSON.stringify(db.monitoring));
-            localStorage.setItem('reports', JSON.stringify(db.reports));
-            localStorage.setItem('complianceChecklist', JSON.stringify(db.complianceChecklist));
-            localStorage.setItem('settings', JSON.stringify(db.settings));
+            try {
+                localStorage.setItem('assessments', JSON.stringify(db.assessments));
+                localStorage.setItem('species', JSON.stringify(db.species));
+                localStorage.setItem('activities', JSON.stringify(db.activities));
+                localStorage.setItem('monitoring', JSON.stringify(db.monitoring));
+                localStorage.setItem('reports', JSON.stringify(db.reports));
+                localStorage.setItem('faunaSightings', JSON.stringify(db.faunaSightings));
+                localStorage.setItem('vegetationSurveys', JSON.stringify(db.vegetationSurveys));
+                localStorage.setItem('complianceChecklist', JSON.stringify(db.complianceChecklist));
+                localStorage.setItem('settings', JSON.stringify(db.settings));
+                return true;
+            } catch (e) {
+                console.error('Error saving data:', e);
+                showToast('Error', 'Failed to save data. Storage may be full.', 'error');
+                return false;
+            }
         }
 
         // Show toast notification
@@ -1736,275 +1899,296 @@
         // Initialize charts
         function initCharts() {
             // Health Indicators Chart
-            const healthCtx = document.getElementById('healthChart').getContext('2d');
-            window.healthChart = new Chart(healthCtx, {
-                type: 'radar',
-                data: {
-                    labels: ['Biodiversity', 'Native Cover', 'Weed Cover', 'Erosion', 'Fauna', 'Water Quality'],
-                    datasets: [{
-                        label: 'Current',
-                        data: [78, 65, 22, 15, 70, 85],
-                        backgroundColor: 'rgba(40, 167, 69, 0.2)',
-                        borderColor: 'rgba(40, 167, 69, 1)',
-                        borderWidth: 1
-                    }, {
-                        label: 'Previous',
-                        data: [72, 60, 28, 18, 65, 80],
-                        backgroundColor: 'rgba(108, 117, 125, 0.2)',
-                        borderColor: 'rgba(108, 117, 125, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        r: {
-                            angleLines: {
-                                display: true
-                            },
-                            suggestedMin: 0,
-                            suggestedMax: 100
+            const healthCtx = document.getElementById('healthChart');
+            if (healthCtx) {
+                window.healthChart = new Chart(healthCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Biodiversity', 'Native Cover', 'Weed Cover', 'Erosion', 'Fauna', 'Water Quality'],
+                        datasets: [{
+                            label: 'Current',
+                            data: [78, 65, 22, 15, 70, 85],
+                            backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                            borderColor: 'rgba(40, 167, 69, 1)',
+                            borderWidth: 1
+                        }, {
+                            label: 'Previous',
+                            data: [72, 60, 28, 18, 65, 80],
+                            backgroundColor: 'rgba(108, 117, 125, 0.2)',
+                            borderColor: 'rgba(108, 117, 125, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            r: {
+                                angleLines: {
+                                    display: true
+                                },
+                                suggestedMin: 0,
+                                suggestedMax: 100
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
 
             // Fauna Monitoring Chart
-            const faunaCtx = document.getElementById('faunaChart').getContext('2d');
-            window.faunaChart = new Chart(faunaCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [{
-                        label: 'Koala',
-                        data: [2, 3, 1, 4, 3, 2],
-                        borderColor: 'rgba(220, 53, 69, 1)',
-                        backgroundColor: 'rgba(220, 53, 69, 0.1)',
-                        tension: 0.1,
-                        fill: true
-                    }, {
-                        label: 'Bush Stone-curlew',
-                        data: [5, 4, 6, 3, 5, 7],
-                        borderColor: 'rgba(255, 193, 7, 1)',
-                        backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                        tension: 0.1,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Threatened Species Sightings'
-                        }
+            const faunaCtx = document.getElementById('faunaChart');
+            if (faunaCtx) {
+                window.faunaChart = new Chart(faunaCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Koala',
+                            data: [2, 3, 1, 4, 3, 2],
+                            borderColor: 'rgba(220, 53, 69, 1)',
+                            backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                            tension: 0.1,
+                            fill: true
+                        }, {
+                            label: 'Bush Stone-curlew',
+                            data: [5, 4, 6, 3, 5, 7],
+                            borderColor: 'rgba(255, 193, 7, 1)',
+                            backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                            tension: 0.1,
+                            fill: true
+                        }]
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Threatened Species Sightings'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
 
             // Vegetation Monitoring Chart
-            const vegetationCtx = document.getElementById('vegetationChart').getContext('2d');
-            window.vegetationChart = new Chart(vegetationCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Zone 1', 'Zone 2', 'Zone 3', 'Zone 4'],
-                    datasets: [{
-                        label: 'Native Cover (%)',
-                        data: [75, 60, 45, 80],
-                        backgroundColor: 'rgba(40, 167, 69, 0.7)',
-                    }, {
-                        label: 'Weed Cover (%)',
-                        data: [15, 25, 40, 10],
-                        backgroundColor: 'rgba(220, 53, 69, 0.7)',
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Vegetation Cover by Zone'
-                        }
+            const vegetationCtx = document.getElementById('vegetationChart');
+            if (vegetationCtx) {
+                window.vegetationChart = new Chart(vegetationCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Zone 1', 'Zone 2', 'Zone 3', 'Zone 4'],
+                        datasets: [{
+                            label: 'Native Cover (%)',
+                            data: [75, 60, 45, 80],
+                            backgroundColor: 'rgba(40, 167, 69, 0.7)',
+                        }, {
+                            label: 'Weed Cover (%)',
+                            data: [15, 25, 40, 10],
+                            backgroundColor: 'rgba(220, 53, 69, 0.7)',
+                        }]
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Vegetation Cover by Zone'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
         }
 
         // Initialize map
         function initMap() {
-            // Initialize the map
-            window.map = L.map('map').setView([-33.4000, 150.3000], 13); // Blue Mountains coordinates and zoom level
+            const mapElement = document.getElementById('map');
+            if (!mapElement) return;
+            
+            try {
+                // Initialize the map
+                window.map = L.map('map').setView([-33.4000, 150.3000], 13); // Blue Mountains coordinates and zoom level
 
-            // Add OpenStreetMap tiles
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(window.map);
-
-            // Add a marker for the default location
-            const marker = L.marker([-33.4000, 150.3000]).addTo(window.map)
-                .bindPopup('Blue Mountains Conservation Area')
-                .openPopup();
-
-            // Add some sample zones (polygons)
-            const zone1 = L.polygon([
-                [-33.41, 150.29],
-                [-33.41, 150.31],
-                [-33.39, 150.31],
-                [-33.39, 150.29]
-            ], {color: 'blue', fillOpacity: 0.2}).addTo(window.map).bindPopup('Zone 1 - Native Forest');
-
-            const zone2 = L.polygon([
-                [-33.42, 150.305],
-                [-33.42, 150.315],
-                [-33.40, 150.315],
-                [-33.40, 150.305]
-            ], {color: 'green', fillOpacity: 0.2}).addTo(window.map).bindPopup('Zone 2 - Wetland Area');
-
-            const zone3 = L.polygon([
-                [-33.38, 150.295],
-                [-33.38, 150.305],
-                [-33.36, 150.305],
-                [-33.36, 150.295]
-            ], {color: 'red', fillOpacity: 0.2}).addTo(window.map).bindPopup('Zone 3 - Weed Control Area');
-
-            // Create layer groups for different map features
-            window.zonesLayer = L.layerGroup([zone1, zone2, zone3]);
-            window.vegetationLayer = L.layerGroup();
-            window.weedsLayer = L.layerGroup();
-
-            // Add some sample vegetation points
-            L.marker([-33.405, 150.302]).addTo(window.vegetationLayer)
-                .bindPopup('Eucalyptus pauciflora (Snow Gum)');
-            L.marker([-33.404, 150.304]).addTo(window.vegetationLayer)
-                .bindPopup('Acacia melanoxylon (Blackwood)');
-            L.marker([-33.406, 150.301]).addTo(window.vegetationLayer)
-                .bindPopup('Banksia marginata (Silver Banksia)');
-
-            // Add some sample weed points
-            L.marker([-33.365, 150.301]).addTo(window.weedsLayer)
-                .bindPopup('Rubus fruticosus (Blackberry)');
-            L.marker([-33.364, 150.303]).addTo(window.weedsLayer)
-                .bindPopup('Lantana camara (Lantana)');
-            L.marker([-33.366, 150.302]).addTo(window.weedsLayer)
-                .bindPopup('Ulex europaeus (Gorse)');
-
-            // Add layer control
-            const baseLayers = {
-                "OpenStreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                // Add OpenStreetMap tiles
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }),
-                "Satellite": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-                })
-            };
+                }).addTo(window.map);
 
-            const overlays = {
-                "Zones": window.zonesLayer,
-                "Vegetation": window.vegetationLayer,
-                "Weeds": window.weedsLayer
-            };
+                // Add a marker for the default location
+                const marker = L.marker([-33.4000, 150.3000]).addTo(window.map)
+                    .bindPopup('Blue Mountains Conservation Area')
+                    .openPopup();
 
-            L.control.layers(baseLayers, overlays, {collapsed: false}).addTo(window.map);
+                // Add some sample zones (polygons)
+                const zone1 = L.polygon([
+                    [-33.41, 150.29],
+                    [-33.41, 150.31],
+                    [-33.39, 150.31],
+                    [-33.39, 150.29]
+                ], {color: 'blue', fillOpacity: 0.2}).addTo(window.map).bindPopup('Zone 1 - Native Forest');
 
-            // Default to showing zones
-            window.zonesLayer.addTo(window.map);
+                const zone2 = L.polygon([
+                    [-33.42, 150.305],
+                    [-33.42, 150.315],
+                    [-33.40, 150.315],
+                    [-33.40, 150.305]
+                ], {color: 'green', fillOpacity: 0.2}).addTo(window.map).bindPopup('Zone 2 - Wetland Area');
 
-            // Button controls for map layers
-            document.getElementById('zoneToggle').addEventListener('click', function() {
-                if (window.map.hasLayer(window.zonesLayer)) {
-                    window.map.removeLayer(window.zonesLayer);
-                    this.classList.remove('active');
-                } else {
-                    window.map.addLayer(window.zonesLayer);
-                    this.classList.add('active');
-                }
-            });
+                const zone3 = L.polygon([
+                    [-33.38, 150.295],
+                    [-33.38, 150.305],
+                    [-33.36, 150.305],
+                    [-33.36, 150.295]
+                ], {color: 'red', fillOpacity: 0.2}).addTo(window.map).bindPopup('Zone 3 - Weed Control Area');
 
-            document.getElementById('vegetationToggle').addEventListener('click', function() {
-                if (window.map.hasLayer(window.vegetationLayer)) {
-                    window.map.removeLayer(window.vegetationLayer);
-                    this.classList.remove('active');
-                } else {
-                    window.map.addLayer(window.vegetationLayer);
-                    this.classList.add('active');
-                }
-            });
+                // Create layer groups for different map features
+                window.zonesLayer = L.layerGroup([zone1, zone2, zone3]);
+                window.vegetationLayer = L.layerGroup();
+                window.weedsLayer = L.layerGroup();
 
-            document.getElementById('weedsToggle').addEventListener('click', function() {
-                if (window.map.hasLayer(window.weedsLayer)) {
-                    window.map.removeLayer(window.weedsLayer);
-                    this.classList.remove('active');
-                } else {
-                    window.map.addLayer(window.weedsLayer);
-                    this.classList.add('active');
-                }
-            });
+                // Add some sample vegetation points
+                L.marker([-33.405, 150.302]).addTo(window.vegetationLayer)
+                    .bindPopup('Eucalyptus pauciflora (Snow Gum)');
+                L.marker([-33.404, 150.304]).addTo(window.vegetationLayer)
+                    .bindPopup('Acacia melanoxylon (Blackwood)');
+                L.marker([-33.406, 150.301]).addTo(window.vegetationLayer)
+                    .bindPopup('Banksia marginata (Silver Banksia)');
+
+                // Add some sample weed points
+                L.marker([-33.365, 150.301]).addTo(window.weedsLayer)
+                    .bindPopup('Rubus fruticosus (Blackberry)');
+                L.marker([-33.364, 150.303]).addTo(window.weedsLayer)
+                    .bindPopup('Lantana camara (Lantana)');
+                L.marker([-33.366, 150.302]).addTo(window.weedsLayer)
+                    .bindPopup('Ulex europaeus (Gorse)');
+
+                // Add layer control
+                const baseLayers = {
+                    "OpenStreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }),
+                    "Satellite": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                    })
+                };
+
+                const overlays = {
+                    "Zones": window.zonesLayer,
+                    "Vegetation": window.vegetationLayer,
+                    "Weeds": window.weedsLayer
+                };
+
+                L.control.layers(baseLayers, overlays, {collapsed: false}).addTo(window.map);
+
+                // Default to showing zones
+                window.zonesLayer.addTo(window.map);
+
+                // Button controls for map layers
+                document.getElementById('zoneToggle').addEventListener('click', function() {
+                    if (window.map.hasLayer(window.zonesLayer)) {
+                        window.map.removeLayer(window.zonesLayer);
+                        this.classList.remove('active');
+                    } else {
+                        window.map.addLayer(window.zonesLayer);
+                        this.classList.add('active');
+                    }
+                });
+
+                document.getElementById('vegetationToggle').addEventListener('click', function() {
+                    if (window.map.hasLayer(window.vegetationLayer)) {
+                        window.map.removeLayer(window.vegetationLayer);
+                        this.classList.remove('active');
+                    } else {
+                        window.map.addLayer(window.vegetationLayer);
+                        this.classList.add('active');
+                    }
+                });
+
+                document.getElementById('weedsToggle').addEventListener('click', function() {
+                    if (window.map.hasLayer(window.weedsLayer)) {
+                        window.map.removeLayer(window.weedsLayer);
+                        this.classList.remove('active');
+                    } else {
+                        window.map.addLayer(window.weedsLayer);
+                        this.classList.add('active');
+                    }
+                });
+            } catch (error) {
+                console.error('Error initializing map:', error);
+                document.getElementById('map').innerHTML = '<div class="alert alert-warning">Map could not be loaded. Please check your internet connection.</div>';
+            }
         }
 
         // Initialize calendar
         function initCalendar() {
             const calendarEl = document.getElementById('calendar');
-            window.calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                },
-                events: db.activities.map(activity => ({
-                    title: activity.title,
-                    start: activity.startDate,
-                    end: activity.endDate || activity.startDate,
-                    extendedProps: {
-                        type: activity.type,
-                        location: activity.location,
-                        assignedTo: activity.assignedTo,
-                        status: activity.status
+            if (!calendarEl) return;
+            
+            try {
+                window.calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
                     },
-                    backgroundColor: getActivityColor(activity.type),
-                    borderColor: getActivityColor(activity.type),
-                    textColor: '#fff'
-                })),
-                eventClick: function(info) {
-                    const activity = db.activities.find(a => a.title === info.event.title && a.startDate === info.event.startStr);
-                    if (activity) {
-                        showActivityDetails(activity);
+                    events: db.activities.map(activity => ({
+                        title: activity.title,
+                        start: activity.startDate,
+                        end: activity.endDate || activity.startDate,
+                        extendedProps: {
+                            type: activity.type,
+                            location: activity.location,
+                            assignedTo: activity.assignedTo,
+                            status: activity.status
+                        },
+                        backgroundColor: getActivityColor(activity.type),
+                        borderColor: getActivityColor(activity.type),
+                        textColor: '#fff'
+                    })),
+                    eventClick: function(info) {
+                        const activity = db.activities.find(a => a.title === info.event.title && a.startDate === info.event.startStr);
+                        if (activity) {
+                            showActivityDetails(activity);
+                        }
+                    },
+                    eventContent: function(arg) {
+                        // Customize event display to show type and location
+                        const type = arg.event.extendedProps.type;
+                        const location = arg.event.extendedProps.location;
+                        
+                        const eventEl = document.createElement('div');
+                        eventEl.className = 'fc-event-main-frame';
+                        
+                        const titleEl = document.createElement('div');
+                        titleEl.className = 'fc-event-title';
+                        titleEl.innerHTML = `<strong>${arg.event.title}</strong><br>${formatActivityType(type)} - ${location}`;
+                        
+                        eventEl.appendChild(titleEl);
+                        
+                        return { domNodes: [eventEl] };
                     }
-                },
-                eventContent: function(arg) {
-                    // Customize event display to show type and location
-                    const type = arg.event.extendedProps.type;
-                    const location = arg.event.extendedProps.location;
-                    
-                    const eventEl = document.createElement('div');
-                    eventEl.className = 'fc-event-main-frame';
-                    
-                    const titleEl = document.createElement('div');
-                    titleEl.className = 'fc-event-title';
-                    titleEl.innerHTML = `<strong>${arg.event.title}</strong><br>${formatActivityType(type)} - ${location}`;
-                    
-                    eventEl.appendChild(titleEl);
-                    
-                    return { domNodes: [eventEl] };
-                }
-            });
-            window.calendar.render();
+                });
+                window.calendar.render();
+            } catch (error) {
+                console.error('Error initializing calendar:', error);
+                calendarEl.innerHTML = '<div class="alert alert-warning">Calendar could not be loaded.</div>';
+            }
         }
 
         // Get color for activity type
@@ -2035,34 +2219,36 @@
             
             // Upcoming tasks
             const upcomingTasksList = document.getElementById('upcomingTasksList');
-            upcomingTasksList.innerHTML = '';
-            
-            if (upcomingTasks.length === 0) {
-                upcomingTasksList.innerHTML = `
-                    <div class="empty-state">
-                        <i class="bi bi-check-circle"></i>
-                        <p>No upcoming tasks</p>
-                    </div>
-                `;
-            } else {
-                upcomingTasks
-                    .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
-                    .slice(0, 5)
-                    .forEach(task => {
-                    const taskEl = document.createElement('a');
-                    taskEl.href = '#';
-                    taskEl.className = 'list-group-item list-group-item-action';
-                    taskEl.innerHTML = `
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1">${task.title}</h6>
-                            <small class="text-muted">${formatDate(task.startDate)}</small>
+            if (upcomingTasksList) {
+                upcomingTasksList.innerHTML = '';
+                
+                if (upcomingTasks.length === 0) {
+                    upcomingTasksList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="bi bi-check-circle"></i>
+                            <p>No upcoming tasks</p>
                         </div>
-                        <p class="mb-1">${task.description.substring(0, 50)}${task.description.length > 50 ? '...' : ''}</p>
-                        <small class="text-muted">Assigned to: ${task.assignedTo}</small>
                     `;
-                    taskEl.addEventListener('click', () => showActivityDetails(task));
-                    upcomingTasksList.appendChild(taskEl);
-                });
+                } else {
+                    upcomingTasks
+                        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
+                        .slice(0, 5)
+                        .forEach(task => {
+                        const taskEl = document.createElement('a');
+                        taskEl.href = '#';
+                        taskEl.className = 'list-group-item list-group-item-action';
+                        taskEl.innerHTML = `
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">${task.title}</h6>
+                                <small class="text-muted">${formatDate(task.startDate)}</small>
+                            </div>
+                            <p class="mb-1">${task.description.substring(0, 50)}${task.description.length > 50 ? '...' : ''}</p>
+                            <small class="text-muted">Assigned to: ${task.assignedTo}</small>
+                        `;
+                        taskEl.addEventListener('click', () => showActivityDetails(task));
+                        upcomingTasksList.appendChild(taskEl);
+                    });
+                }
             }
             
             // Recent observations
@@ -2071,58 +2257,65 @@
                 .slice(0, 4);
             
             const recentObservationsList = document.getElementById('recentObservationsList');
-            recentObservationsList.innerHTML = '';
-            
-            if (recentObservations.length === 0) {
-                recentObservationsList.innerHTML = `
-                    <li class="list-group-item empty-state">
-                        <i class="bi bi-binoculars"></i>
-                        <p>No recent observations</p>
-                    </li>
-                `;
-            } else {
-                recentObservations.forEach(obs => {
-                    const obsEl = document.createElement('li');
-                    obsEl.className = 'list-group-item d-flex justify-content-between align-items-center';
-                    obsEl.innerHTML = `
-                        ${obs.type === 'fauna-survey' ? 'Fauna sighting' : 'Vegetation survey'}
-                        <span class="badge ${getStatusBadgeClass(obs.type === 'fauna-survey' ? 'info' : 'success')} rounded-pill">
-                            ${obs.type === 'fauna-survey' ? 'Fauna' : 'Flora'}
-                        </span>
+            if (recentObservationsList) {
+                recentObservationsList.innerHTML = '';
+                
+                if (recentObservations.length === 0) {
+                    recentObservationsList.innerHTML = `
+                        <li class="list-group-item empty-state">
+                            <i class="bi bi-binoculars"></i>
+                            <p>No recent observations</p>
+                        </li>
                     `;
-                    obsEl.addEventListener('click', () => showMonitoringDetails(obs));
-                    recentObservationsList.appendChild(obsEl);
-                });
+                } else {
+                    recentObservations.forEach(obs => {
+                        const obsEl = document.createElement('li');
+                        obsEl.className = 'list-group-item d-flex justify-content-between align-items-center';
+                        obsEl.innerHTML = `
+                            ${obs.type === 'fauna-survey' ? 'Fauna sighting' : 'Vegetation survey'}
+                            <span class="badge ${getStatusBadgeClass(obs.type === 'fauna-survey' ? 'info' : 'success')} rounded-pill">
+                                ${obs.type === 'fauna-survey' ? 'Fauna' : 'Flora'}
+                            </span>
+                        `;
+                        obsEl.addEventListener('click', () => showMonitoringDetails(obs));
+                        recentObservationsList.appendChild(obsEl);
+                    });
+                }
             }
             
             // Compliance checklist
             const complianceChecklist = document.getElementById('complianceChecklist');
-            complianceChecklist.innerHTML = '';
-            
-            document.getElementById('complianceProgress').style.width = `${progressPercentage}%`;
-            document.getElementById('complianceProgress').textContent = `${progressPercentage}% Complete`;
-            document.getElementById('complianceProgress').setAttribute('aria-valuenow', progressPercentage);
-            
-            db.complianceChecklist.forEach(item => {
-                const checkEl = document.createElement('div');
-                checkEl.className = 'form-check mb-2';
-                checkEl.innerHTML = `
-                    <input class="form-check-input" type="checkbox" id="check${item.id}" ${item.compliant === 'Yes' ? 'checked' : ''}>
-                    <label class="form-check-label" for="check${item.id}">
-                        ${item.requirement}
-                    </label>
-                `;
-                complianceChecklist.appendChild(checkEl);
-            });
+            if (complianceChecklist) {
+                complianceChecklist.innerHTML = '';
+                
+                document.getElementById('complianceProgress').style.width = `${progressPercentage}%`;
+                document.getElementById('complianceProgress').textContent = `${progressPercentage}% Complete`;
+                document.getElementById('complianceProgress').setAttribute('aria-valuenow', progressPercentage);
+                
+                db.complianceChecklist.forEach(item => {
+                    const checkEl = document.createElement('div');
+                    checkEl.className = 'form-check mb-2';
+                    checkEl.innerHTML = `
+                        <input class="form-check-input" type="checkbox" id="check${item.id}" ${item.compliant === 'Yes' ? 'checked' : ''}>
+                        <label class="form-check-label" for="check${item.id}">
+                            ${item.requirement}
+                        </label>
+                    `;
+                    complianceChecklist.appendChild(checkEl);
+                });
+            }
         }
 
         // Load assessments
         function loadAssessments() {
-            const assessmentsTable = document.getElementById('assessmentsTable').getElementsByTagName('tbody')[0];
-            assessmentsTable.innerHTML = '';
+            const assessmentsTable = document.getElementById('assessmentsTable');
+            if (!assessmentsTable) return;
+            
+            const tbody = assessmentsTable.getElementsByTagName('tbody')[0];
+            tbody.innerHTML = '';
             
             if (db.assessments.length === 0) {
-                assessmentsTable.innerHTML = `
+                tbody.innerHTML = `
                     <tr>
                         <td colspan="5" class="text-center">
                             <div class="empty-state">
@@ -2135,7 +2328,7 @@
                 `;
             } else {
                 db.assessments.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(assessment => {
-                    const row = assessmentsTable.insertRow();
+                    const row = tbody.insertRow();
                     row.innerHTML = `
                         <td>${formatDate(assessment.date)}</td>
                         <td>${assessment.assessor}</td>
@@ -2167,51 +2360,56 @@
         function loadSpecies() {
             // Species cards
             const speciesCardsContainer = document.getElementById('speciesCardsContainer');
-            speciesCardsContainer.innerHTML = '';
-            
-            const recentSpecies = db.species
-                .sort((a, b) => new Date(b.lastObserved || 0) - new Date(a.lastObserved || 0))
-                .slice(0, 3);
-            
-            if (recentSpecies.length === 0) {
-                speciesCardsContainer.innerHTML = `
-                    <div class="col-12">
-                        <div class="empty-state">
-                            <i class="bi bi-tree"></i>
-                            <p>No species recorded yet</p>
-                            <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#newSpeciesModal">Add First Species</button>
-                        </div>
-                    </div>
-                `;
-            } else {
-                recentSpecies.forEach(species => {
-                    const cardCol = document.createElement('div');
-                    cardCol.className = 'col-md-4 mb-4';
-                    cardCol.innerHTML = `
-                        <div class="card h-100 species-card">
-                            <img src="${species.image || 'https://via.placeholder.com/300x200?text=No+image'}" class="card-img-top" alt="${species.scientificName}" style="height: 200px; object-fit: cover;">
-                            <div class="card-body">
-                                <h5 class="card-title">${species.scientificName}</h5>
-                                <h6 class="card-subtitle mb-2 text-muted">${species.commonName || 'No common name'}</h6>
-                                <p class="card-text">
-                                    <span class="badge ${getSpeciesStatusBadgeClass(species.status)} me-1">${capitalizeFirstLetter(species.status)}</span>
-                                    ${species.type === 'weed' || species.type === 'pest' ? `<span class="badge bg-warning">High priority</span>` : ''}
-                                </p>
-                                <p class="card-text"><small>Last observed: ${species.lastObserved ? formatDate(species.lastObserved) : 'Not recorded'}</small></p>
-                                <button class="btn btn-sm btn-outline-primary view-species" data-id="${species.id}">View Details</button>
+            if (speciesCardsContainer) {
+                speciesCardsContainer.innerHTML = '';
+                
+                const recentSpecies = db.species
+                    .sort((a, b) => new Date(b.lastObserved || 0) - new Date(a.lastObserved || 0))
+                    .slice(0, 3);
+                
+                if (recentSpecies.length === 0) {
+                    speciesCardsContainer.innerHTML = `
+                        <div class="col-12">
+                            <div class="empty-state">
+                                <i class="bi bi-tree"></i>
+                                <p>No species recorded yet</p>
+                                <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#newSpeciesModal">Add First Species</button>
                             </div>
                         </div>
                     `;
-                    speciesCardsContainer.appendChild(cardCol);
-                });
+                } else {
+                    recentSpecies.forEach(species => {
+                        const cardCol = document.createElement('div');
+                        cardCol.className = 'col-md-4 mb-4';
+                        cardCol.innerHTML = `
+                            <div class="card h-100 species-card">
+                                <img src="${species.image || 'https://via.placeholder.com/300x200?text=No+image'}" class="card-img-top" alt="${species.scientificName}" style="height: 200px; object-fit: cover;">
+                                <div class="card-body">
+                                    <h5 class="card-title">${species.scientificName}</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">${species.commonName || 'No common name'}</h6>
+                                    <p class="card-text">
+                                        <span class="badge ${getSpeciesStatusBadgeClass(species.status)} me-1">${capitalizeFirstLetter(species.status)}</span>
+                                        ${species.type === 'weed' || species.type === 'pest' ? `<span class="badge bg-warning">High priority</span>` : ''}
+                                    </p>
+                                    <p class="card-text"><small>Last observed: ${species.lastObserved ? formatDate(species.lastObserved) : 'Not recorded'}</small></p>
+                                    <button class="btn btn-sm btn-outline-primary view-species" data-id="${species.id}">View Details</button>
+                                </div>
+                            </div>
+                        `;
+                        speciesCardsContainer.appendChild(cardCol);
+                    });
+                }
             }
             
             // Species table
-            const speciesTable = document.getElementById('speciesTable').getElementsByTagName('tbody')[0];
-            speciesTable.innerHTML = '';
+            const speciesTable = document.getElementById('speciesTable');
+            if (!speciesTable) return;
+            
+            const tbody = speciesTable.getElementsByTagName('tbody')[0];
+            tbody.innerHTML = '';
             
             if (db.species.length === 0) {
-                speciesTable.innerHTML = `
+                tbody.innerHTML = `
                     <tr>
                         <td colspan="6" class="text-center">
                             <div class="empty-state">
@@ -2224,11 +2422,16 @@
             } else {
                 // Populate monitoring species dropdown
                 const monitoringSpeciesSelect = document.getElementById('monitoringSpecies');
-                monitoringSpeciesSelect.innerHTML = '';
+                const faunaSpeciesSelect = document.getElementById('faunaSpecies');
+                const vegetationSpeciesSelect = document.getElementById('vegetationSpecies');
+                
+                if (monitoringSpeciesSelect) monitoringSpeciesSelect.innerHTML = '';
+                if (faunaSpeciesSelect) faunaSpeciesSelect.innerHTML = '<option value="" selected disabled>Select species...</option>';
+                if (vegetationSpeciesSelect) vegetationSpeciesSelect.innerHTML = '';
                 
                 db.species.forEach(species => {
                     // Add to table
-                    const row = speciesTable.insertRow();
+                    const row = tbody.insertRow();
                     row.innerHTML = `
                         <td>${species.scientificName}</td>
                         <td>${species.commonName || '-'}</td>
@@ -2248,10 +2451,28 @@
                     `;
                     
                     // Add to monitoring species dropdown
-                    const option = document.createElement('option');
-                    option.value = species.id;
-                    option.textContent = `${species.scientificName}${species.commonName ? ` (${species.commonName})` : ''}`;
-                    monitoringSpeciesSelect.appendChild(option);
+                    if (monitoringSpeciesSelect) {
+                        const option = document.createElement('option');
+                        option.value = species.id;
+                        option.textContent = `${species.scientificName}${species.commonName ? ` (${species.commonName})` : ''}`;
+                        monitoringSpeciesSelect.appendChild(option);
+                    }
+                    
+                    // Add to fauna species dropdown
+                    if (faunaSpeciesSelect && species.type === 'fauna') {
+                        const option = document.createElement('option');
+                        option.value = species.id;
+                        option.textContent = `${species.scientificName}${species.commonName ? ` (${species.commonName})` : ''}`;
+                        faunaSpeciesSelect.appendChild(option);
+                    }
+                    
+                    // Add to vegetation species dropdown
+                    if (vegetationSpeciesSelect && species.type === 'flora') {
+                        const option = document.createElement('option');
+                        option.value = species.id;
+                        option.textContent = `${species.scientificName}${species.commonName ? ` (${species.commonName})` : ''}`;
+                        vegetationSpeciesSelect.appendChild(option);
+                    }
                 });
             }
             
@@ -2270,123 +2491,132 @@
         // Load activities
         function loadActivities() {
             // Upcoming activities
-            const upcomingTable = document.getElementById('upcomingActivitiesTable').getElementsByTagName('tbody')[0];
-            upcomingTable.innerHTML = '';
-            
-            const upcomingActivities = db.activities
-                .filter(a => a.status === 'planned' || a.status === 'in-progress')
-                .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-            
-            if (upcomingActivities.length === 0) {
-                upcomingTable.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="text-center">
-                            <div class="empty-state">
-                                <i class="bi bi-calendar-check"></i>
-                                <p>No upcoming activities</p>
-                                <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#newActivityModal">Schedule First Activity</button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            } else {
-                upcomingActivities.forEach(activity => {
-                    const row = upcomingTable.insertRow();
-                    row.innerHTML = `
-                        <td>${activity.title}</td>
-                        <td>${formatActivityType(activity.type)}</td>
-                        <td>${formatDate(activity.startDate)}</td>
-                        <td>${activity.location}</td>
-                        <td>${activity.assignedTo}</td>
-                        <td><span class="badge ${getStatusBadgeClass(activity.status)}">${capitalizeFirstLetter(activity.status)}</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-sm btn-outline-primary view-activity" data-id="${activity.id}">Details</button>
-                            </div>
-                        </td>
+            const upcomingTable = document.getElementById('upcomingActivitiesTable');
+            if (upcomingTable) {
+                const tbody = upcomingTable.getElementsByTagName('tbody')[0];
+                tbody.innerHTML = '';
+                
+                const upcomingActivities = db.activities
+                    .filter(a => a.status === 'planned' || a.status === 'in-progress')
+                    .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+                
+                if (upcomingActivities.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="text-center">
+                                <div class="empty-state">
+                                    <i class="bi bi-calendar-check"></i>
+                                    <p>No upcoming activities</p>
+                                    <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#newActivityModal">Schedule First Activity</button>
+                                </div>
+                            </td>
+                        </tr>
                     `;
-                });
+                } else {
+                    upcomingActivities.forEach(activity => {
+                        const row = tbody.insertRow();
+                        row.innerHTML = `
+                            <td>${activity.title}</td>
+                            <td>${formatActivityType(activity.type)}</td>
+                            <td>${formatDate(activity.startDate)}</td>
+                            <td>${activity.location}</td>
+                            <td>${activity.assignedTo}</td>
+                            <td><span class="badge ${getStatusBadgeClass(activity.status)}">${capitalizeFirstLetter(activity.status)}</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-sm btn-outline-primary view-activity" data-id="${activity.id}">Details</button>
+                                </div>
+                            </td>
+                        `;
+                    });
+                }
             }
             
             // Completed activities
-            const completedTable = document.getElementById('completedActivitiesTable').getElementsByTagName('tbody')[0];
-            completedTable.innerHTML = '';
-            
-            const completedActivities = db.activities
-                .filter(a => a.status === 'completed')
-                .sort((a, b) => new Date(b.endDate || b.startDate) - new Date(a.endDate || a.startDate));
-            
-            if (completedActivities.length === 0) {
-                completedTable.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="text-center">
-                            <div class="empty-state">
-                                <i class="bi bi-check-circle"></i>
-                                <p>No completed activities</p>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            } else {
-                completedActivities.forEach(activity => {
-                    const row = completedTable.insertRow();
-                    row.innerHTML = `
-                        <td>${activity.title}</td>
-                        <td>${formatActivityType(activity.type)}</td>
-                        <td>${formatDate(activity.endDate || activity.startDate)}</td>
-                        <td>${activity.location}</td>
-                        <td>${activity.assignedTo}</td>
-                        <td><span class="badge ${getStatusBadgeClass(activity.status)}">${capitalizeFirstLetter(activity.status)}</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-sm btn-outline-primary view-activity" data-id="${activity.id}">Details</button>
-                                <button class="btn btn-sm btn-outline-secondary report-activity" data-id="${activity.id}">Report</button>
-                            </div>
-                        </td>
+            const completedTable = document.getElementById('completedActivitiesTable');
+            if (completedTable) {
+                const tbody = completedTable.getElementsByTagName('tbody')[0];
+                tbody.innerHTML = '';
+                
+                const completedActivities = db.activities
+                    .filter(a => a.status === 'completed')
+                    .sort((a, b) => new Date(b.endDate || b.startDate) - new Date(a.endDate || a.startDate));
+                
+                if (completedActivities.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="text-center">
+                                <div class="empty-state">
+                                    <i class="bi bi-check-circle"></i>
+                                    <p>No completed activities</p>
+                                </div>
+                            </td>
+                        </tr>
                     `;
-                });
+                } else {
+                    completedActivities.forEach(activity => {
+                        const row = tbody.insertRow();
+                        row.innerHTML = `
+                            <td>${activity.title}</td>
+                            <td>${formatActivityType(activity.type)}</td>
+                            <td>${formatDate(activity.endDate || activity.startDate)}</td>
+                            <td>${activity.location}</td>
+                            <td>${activity.assignedTo}</td>
+                            <td><span class="badge ${getStatusBadgeClass(activity.status)}">${capitalizeFirstLetter(activity.status)}</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-sm btn-outline-primary view-activity" data-id="${activity.id}">Details</button>
+                                    <button class="btn btn-sm btn-outline-secondary report-activity" data-id="${activity.id}">Report</button>
+                                </div>
+                            </td>
+                        `;
+                    });
+                }
             }
             
             // Overdue activities
-            const overdueTable = document.getElementById('overdueActivitiesTable').getElementsByTagName('tbody')[0];
-            overdueTable.innerHTML = '';
-            
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            const overdueActivities = db.activities
-                .filter(a => (a.status === 'planned' || a.status === 'in-progress') && new Date(a.startDate) < today)
-                .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-            
-            if (overdueActivities.length === 0) {
-                overdueTable.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="text-center">
-                            <div class="empty-state">
-                                <i class="bi bi-exclamation-triangle"></i>
-                                <p>No overdue activities</p>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            } else {
-                overdueActivities.forEach(activity => {
-                    const row = overdueTable.insertRow();
-                    row.innerHTML = `
-                        <td>${activity.title}</td>
-                        <td>${formatActivityType(activity.type)}</td>
-                        <td>${formatDate(activity.startDate)}</td>
-                        <td>${activity.location}</td>
-                        <td>${activity.assignedTo}</td>
-                        <td><span class="badge bg-danger">Overdue</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-sm btn-outline-primary view-activity" data-id="${activity.id}">Details</button>
-                                <button class="btn btn-sm btn-warning reschedule-activity" data-id="${activity.id}">Reschedule</button>
-                            </div>
-                        </td>
+            const overdueTable = document.getElementById('overdueActivitiesTable');
+            if (overdueTable) {
+                const tbody = overdueTable.getElementsByTagName('tbody')[0];
+                tbody.innerHTML = '';
+                
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                const overdueActivities = db.activities
+                    .filter(a => (a.status === 'planned' || a.status === 'in-progress') && new Date(a.startDate) < today)
+                    .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+                
+                if (overdueActivities.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="text-center">
+                                <div class="empty-state">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    <p>No overdue activities</p>
+                                </div>
+                            </td>
+                        </tr>
                     `;
-                });
+                } else {
+                    overdueActivities.forEach(activity => {
+                        const row = tbody.insertRow();
+                        row.innerHTML = `
+                            <td>${activity.title}</td>
+                            <td>${formatActivityType(activity.type)}</td>
+                            <td>${formatDate(activity.startDate)}</td>
+                            <td>${activity.location}</td>
+                            <td>${activity.assignedTo}</td>
+                            <td><span class="badge bg-danger">Overdue</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-sm btn-outline-primary view-activity" data-id="${activity.id}">Details</button>
+                                    <button class="btn btn-sm btn-warning reschedule-activity" data-id="${activity.id}">Reschedule</button>
+                                </div>
+                            </td>
+                        `;
+                    });
+                }
             }
             
             // Add event listeners to activity buttons
@@ -2403,11 +2633,14 @@
 
         // Load monitoring
         function loadMonitoring() {
-            const monitoringTable = document.getElementById('monitoringTable').getElementsByTagName('tbody')[0];
-            monitoringTable.innerHTML = '';
+            const monitoringTable = document.getElementById('monitoringTable');
+            if (!monitoringTable) return;
+            
+            const tbody = monitoringTable.getElementsByTagName('tbody')[0];
+            tbody.innerHTML = '';
             
             if (db.monitoring.length === 0) {
-                monitoringTable.innerHTML = `
+                tbody.innerHTML = `
                     <tr>
                         <td colspan="6" class="text-center">
                             <div class="empty-state">
@@ -2420,7 +2653,7 @@
                 `;
             } else {
                 db.monitoring.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(monitoring => {
-                    const row = monitoringTable.insertRow();
+                    const row = tbody.insertRow();
                     row.innerHTML = `
                         <td>${formatDate(monitoring.date)}</td>
                         <td>${formatMonitoringType(monitoring.type)}</td>
@@ -2453,11 +2686,14 @@
 
         // Load reports
         function loadReports() {
-            const reportsTable = document.getElementById('reportsTable').getElementsByTagName('tbody')[0];
-            reportsTable.innerHTML = '';
+            const reportsTable = document.getElementById('reportsTable');
+            if (!reportsTable) return;
+            
+            const tbody = reportsTable.getElementsByTagName('tbody')[0];
+            tbody.innerHTML = '';
             
             if (db.reports.length === 0) {
-                reportsTable.innerHTML = `
+                tbody.innerHTML = `
                     <tr>
                         <td colspan="5" class="text-center">
                             <div class="empty-state">
@@ -2470,7 +2706,7 @@
                 `;
             } else {
                 db.reports.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(report => {
-                    const row = reportsTable.insertRow();
+                    const row = tbody.insertRow();
                     row.innerHTML = `
                         <td>${formatDate(report.date)}</td>
                         <td>${formatReportType(report.type)}</td>
@@ -2500,11 +2736,14 @@
 
         // Load compliance checklist
         function loadComplianceChecklist() {
-            const complianceTable = document.getElementById('complianceChecklistTable').getElementsByTagName('tbody')[0];
-            complianceTable.innerHTML = '';
+            const complianceTable = document.getElementById('complianceChecklistTable');
+            if (!complianceTable) return;
+            
+            const tbody = complianceTable.getElementsByTagName('tbody')[0];
+            tbody.innerHTML = '';
             
             db.complianceChecklist.forEach(item => {
-                const row = complianceTable.insertRow();
+                const row = tbody.insertRow();
                 row.innerHTML = `
                     <td>${item.requirement}</td>
                     <td>
@@ -2530,140 +2769,215 @@
             const settings = db.settings;
             
             // User profile
-            document.getElementById('userName').value = settings.userProfile.name || '';
-            document.getElementById('userEmail').value = settings.userProfile.email || '';
-            document.getElementById('userRole').value = settings.userProfile.role || '';
+            const userName = document.getElementById('userName');
+            const userEmail = document.getElementById('userEmail');
+            const userRole = document.getElementById('userRole');
+            
+            if (userName) userName.value = settings.userProfile.name || '';
+            if (userEmail) userEmail.value = settings.userProfile.email || '';
+            if (userRole) userRole.value = settings.userProfile.role || '';
             
             // Site settings
-            document.getElementById('siteName').value = settings.siteName || '';
-            document.getElementById('siteLocation').value = settings.siteLocation || '';
-            document.getElementById('siteArea').value = settings.siteArea || '';
-            document.getElementById('siteDescription').value = settings.siteDescription || '';
+            const siteName = document.getElementById('siteName');
+            const siteLocation = document.getElementById('siteLocation');
+            const siteArea = document.getElementById('siteArea');
+            const siteDescription = document.getElementById('siteDescription');
+            
+            if (siteName) siteName.value = settings.siteName || '';
+            if (siteLocation) siteLocation.value = settings.siteLocation || '';
+            if (siteArea) siteArea.value = settings.siteArea || '';
+            if (siteDescription) siteDescription.value = settings.siteDescription || '';
         }
 
         // Set up event listeners
         function setupEventListeners() {
             // Assessment form submission
-            document.getElementById('saveAssessment').addEventListener('click', function() {
+            document.getElementById('saveAssessment')?.addEventListener('click', function() {
                 saveAssessment();
             });
             
             // Activity form submission
-            document.getElementById('saveActivity').addEventListener('click', function() {
+            document.getElementById('saveActivity')?.addEventListener('click', function() {
                 saveActivity();
             });
             
             // Species form submission
-            document.getElementById('saveSpecies').addEventListener('click', function() {
+            document.getElementById('saveSpecies')?.addEventListener('click', function() {
                 saveSpecies();
             });
             
             // Monitoring form submission
-            document.getElementById('saveMonitoring').addEventListener('click', function() {
+            document.getElementById('saveMonitoring')?.addEventListener('click', function() {
                 saveMonitoring();
             });
             
+            // Fauna sighting form submission
+            document.getElementById('saveFaunaSighting')?.addEventListener('click', function() {
+                saveFaunaSighting();
+            });
+            
+            // Vegetation survey form submission
+            document.getElementById('saveVegetationSurvey')?.addEventListener('click', function() {
+                saveVegetationSurvey();
+            });
+            
             // Compliance checklist save
-            document.getElementById('saveComplianceChecklist').addEventListener('click', function() {
+            document.getElementById('saveComplianceChecklist')?.addEventListener('click', function() {
                 saveComplianceChecklist();
             });
             
             // User profile form submission
-            document.getElementById('userProfileForm').addEventListener('submit', function(e) {
+            document.getElementById('userProfileForm')?.addEventListener('submit', function(e) {
                 e.preventDefault();
                 saveUserProfile();
             });
             
             // Change password form submission
-            document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+            document.getElementById('changePasswordForm')?.addEventListener('submit', function(e) {
                 e.preventDefault();
                 changePassword();
             });
             
             // Site settings form submission
-            document.getElementById('siteSettingsForm').addEventListener('submit', function(e) {
+            document.getElementById('siteSettingsForm')?.addEventListener('submit', function(e) {
                 e.preventDefault();
                 saveSiteSettings();
             });
             
             // Data management buttons
-            document.getElementById('exportAllData').addEventListener('click', function() {
+            document.getElementById('exportAllData')?.addEventListener('click', function() {
                 exportAllData();
             });
             
-            document.getElementById('backupDatabase').addEventListener('click', function() {
+            document.getElementById('backupDatabase')?.addEventListener('click', function() {
                 backupDatabase();
             });
             
-            document.getElementById('resetTestData').addEventListener('click', function() {
+            document.getElementById('resetTestData')?.addEventListener('click', function() {
                 showConfirmation('Reset Test Data', 'Are you sure you want to reset all test data? This cannot be undone.', resetTestData);
             });
             
             // Generate compliance report
-            document.getElementById('generateComplianceReport').addEventListener('click', function() {
+            document.getElementById('generateComplianceReport')?.addEventListener('click', function() {
                 generateComplianceReport();
             });
             
             // Generate report button
-            document.getElementById('generateReportBtn').addEventListener('click', function() {
+            document.getElementById('generateReportBtn')?.addEventListener('click', function() {
                 generateReportFromModal();
             });
             
             // Species image preview
-            document.getElementById('speciesImage').addEventListener('change', function(e) {
+            document.getElementById('speciesImage')?.addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 if (file) {
                     const reader = new FileReader();
                     reader.onload = function(event) {
                         const preview = document.getElementById('speciesImagePreview');
-                        preview.src = event.target.result;
-                        preview.style.display = 'block';
+                        if (preview) {
+                            preview.src = event.target.result;
+                            preview.style.display = 'block';
+                        }
                     };
                     reader.readAsDataURL(file);
                 }
             });
             
             // Assessment photo preview
-            document.getElementById('assessmentPhotos').addEventListener('change', function(e) {
+            document.getElementById('assessmentPhotos')?.addEventListener('change', function(e) {
                 const files = e.target.files;
                 const previewContainer = document.getElementById('assessmentPhotoPreview');
-                previewContainer.innerHTML = '';
-                
-                if (files.length > 0) {
-                    for (let i = 0; i < files.length; i++) {
-                        const file = files[i];
-                        if (file.type.match('image.*')) {
-                            const reader = new FileReader();
-                            reader.onload = function(event) {
-                                const img = document.createElement('img');
-                                img.src = event.target.result;
-                                img.className = 'image-thumbnail';
-                                previewContainer.appendChild(img);
-                            };
-                            reader.readAsDataURL(file);
+                if (previewContainer) {
+                    previewContainer.innerHTML = '';
+                    
+                    if (files.length > 0) {
+                        for (let i = 0; i < files.length; i++) {
+                            const file = files[i];
+                            if (file.type.match('image.*')) {
+                                const reader = new FileReader();
+                                reader.onload = function(event) {
+                                    const img = document.createElement('img');
+                                    img.src = event.target.result;
+                                    img.className = 'image-thumbnail';
+                                    previewContainer.appendChild(img);
+                                };
+                                reader.readAsDataURL(file);
+                            }
                         }
                     }
                 }
             });
             
             // Monitoring photo preview
-            document.getElementById('monitoringPhotos').addEventListener('change', function(e) {
+            document.getElementById('monitoringPhotos')?.addEventListener('change', function(e) {
                 const files = e.target.files;
                 const previewContainer = document.getElementById('monitoringPhotoPreview');
-                previewContainer.innerHTML = '';
-                
-                if (files.length > 0) {
-                    for (let i = 0; i < files.length; i++) {
-                        const file = files[i];
-                        if (file.type.match('image.*')) {
-                            const reader = new FileReader();
-                            reader.onload = function(event) {
-                                const img = document.createElement('img');
-                                img.src = event.target.result;
-                                img.className = 'image-thumbnail';
-                                previewContainer.appendChild(img);
-                            };
-                            reader.readAsDataURL(file);
+                if (previewContainer) {
+                    previewContainer.innerHTML = '';
+                    
+                    if (files.length > 0) {
+                        for (let i = 0; i < files.length; i++) {
+                            const file = files[i];
+                            if (file.type.match('image.*')) {
+                                const reader = new FileReader();
+                                reader.onload = function(event) {
+                                    const img = document.createElement('img');
+                                    img.src = event.target.result;
+                                    img.className = 'image-thumbnail';
+                                    previewContainer.appendChild(img);
+                                };
+                                reader.readAsDataURL(file);
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Fauna photo preview
+            document.getElementById('faunaPhotos')?.addEventListener('change', function(e) {
+                const files = e.target.files;
+                const previewContainer = document.getElementById('faunaPhotoPreview');
+                if (previewContainer) {
+                    previewContainer.innerHTML = '';
+                    
+                    if (files.length > 0) {
+                        for (let i = 0; i < files.length; i++) {
+                            const file = files[i];
+                            if (file.type.match('image.*')) {
+                                const reader = new FileReader();
+                                reader.onload = function(event) {
+                                    const img = document.createElement('img');
+                                    img.src = event.target.result;
+                                    img.className = 'image-thumbnail';
+                                    previewContainer.appendChild(img);
+                                };
+                                reader.readAsDataURL(file);
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Vegetation photo preview
+            document.getElementById('vegetationPhotos')?.addEventListener('change', function(e) {
+                const files = e.target.files;
+                const previewContainer = document.getElementById('vegetationPhotoPreview');
+                if (previewContainer) {
+                    previewContainer.innerHTML = '';
+                    
+                    if (files.length > 0) {
+                        for (let i = 0; i < files.length; i++) {
+                            const file = files[i];
+                            if (file.type.match('image.*')) {
+                                const reader = new FileReader();
+                                reader.onload = function(event) {
+                                    const img = document.createElement('img');
+                                    img.src = event.target.result;
+                                    img.className = 'image-thumbnail';
+                                    previewContainer.appendChild(img);
+                                };
+                                reader.readAsDataURL(file);
+                            }
                         }
                     }
                 }
@@ -2680,7 +2994,9 @@
                         loadAssessments();
                     } else if (target === '#maintenance-plan') {
                         loadActivities();
-                        window.calendar.refetchEvents();
+                        if (window.calendar) {
+                            window.calendar.refetchEvents();
+                        }
                     } else if (target === '#species-register') {
                         loadSpecies();
                     } else if (target === '#monitoring') {
@@ -2702,20 +3018,46 @@
                     validateComponents();
                 });
             });
+            
+            // Export and print buttons
+            document.getElementById('exportDashboard')?.addEventListener('click', function() {
+                exportDashboard();
+            });
+            
+            document.getElementById('printDashboard')?.addEventListener('click', function() {
+                printDashboard();
+            });
+            
+            document.getElementById('exportSpecies')?.addEventListener('click', function() {
+                exportSpecies();
+            });
+            
+            document.getElementById('printSpecies')?.addEventListener('click', function() {
+                printSpecies();
+            });
+            
+            document.getElementById('viewAllFauna')?.addEventListener('click', function() {
+                viewAllFauna();
+            });
+            
+            document.getElementById('viewAllVegetation')?.addEventListener('click', function() {
+                viewAllVegetation();
+            });
         }
 
         // Save assessment
         function saveAssessment() {
-            const form = document.getElementById('assessmentForm');
-            if (!form.checkValidity()) {
-                form.classList.add('was-validated');
+            const form = document.getElementById('newAssessmentForm');
+            if (!form || !form.checkValidity()) {
+                if (form) form.classList.add('was-validated');
                 validateComponents();
                 return;
             }
             
             const selectedComponents = Array.from(document.querySelectorAll('input[name="components"]:checked')).map(cb => cb.value);
             if (selectedComponents.length === 0) {
-                document.getElementById('componentsFeedback').style.display = 'block';
+                const componentsFeedback = document.getElementById('componentsFeedback');
+                if (componentsFeedback) componentsFeedback.style.display = 'block';
                 return;
             }
             
@@ -2734,22 +3076,23 @@
             };
             
             db.assessments.push(newAssessment);
-            saveData();
-            
-            // Reset form
-            form.reset();
-            form.classList.remove('was-validated');
-            document.getElementById('assessmentPhotoPreview').innerHTML = '';
-            
-            // Show success message
-            showToast('Success', 'Assessment saved successfully!');
-            
-            // Reload assessments
-            loadAssessments();
-            
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('newAssessmentModal'));
-            modal.hide();
+            if (saveData()) {
+                // Reset form
+                form.reset();
+                form.classList.remove('was-validated');
+                const assessmentPhotoPreview = document.getElementById('assessmentPhotoPreview');
+                if (assessmentPhotoPreview) assessmentPhotoPreview.innerHTML = '';
+                
+                // Show success message
+                showToast('Success', 'Assessment saved successfully!');
+                
+                // Reload assessments
+                loadAssessments();
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('newAssessmentModal'));
+                if (modal) modal.hide();
+            }
         }
 
         // Save activity
@@ -2760,8 +3103,8 @@
             let isValid = true;
             fields.forEach(field => {
                 const element = document.getElementById(field);
-                if (!element.value) {
-                    element.classList.add('is-invalid');
+                if (!element || !element.value) {
+                    if (element) element.classList.add('is-invalid');
                     isValid = false;
                 } else {
                     element.classList.remove('is-invalid');
@@ -2786,18 +3129,20 @@
             };
             
             db.activities.push(newActivity);
-            saveData();
-            
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('newActivityModal'));
-            modal.hide();
-            
-            // Show success message
-            showToast('Success', 'Activity saved successfully!');
-            
-            // Reload activities
-            loadActivities();
-            window.calendar.refetchEvents();
+            if (saveData()) {
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('newActivityModal'));
+                if (modal) modal.hide();
+                
+                // Show success message
+                showToast('Success', 'Activity saved successfully!');
+                
+                // Reload activities
+                loadActivities();
+                if (window.calendar) {
+                    window.calendar.refetchEvents();
+                }
+            }
         }
 
         // Save species
@@ -2808,11 +3153,11 @@
             let isValid = true;
             fields.forEach(field => {
                 const element = document.getElementById(field);
-                if (!element.value) {
-                    element.classList.add('is-invalid');
+                if (!element || !element.value) {
+                    if (element) element.classList.add('is-invalid');
                     isValid = false;
                 } else {
-                    element.classList.remove('is-invalid');
+                    if (element) element.classList.remove('is-invalid');
                 }
             });
             
@@ -2821,7 +3166,7 @@
             // Handle image upload (simplified for demo)
             let image = '';
             const fileInput = document.getElementById('speciesImage');
-            if (fileInput.files.length > 0) {
+            if (fileInput && fileInput.files.length > 0) {
                 image = URL.createObjectURL(fileInput.files[0]);
             }
             
@@ -2840,17 +3185,17 @@
             };
             
             db.species.push(newSpecies);
-            saveData();
-            
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('newSpeciesModal'));
-            modal.hide();
-            
-            // Show success message
-            showToast('Success', 'Species record saved successfully!');
-            
-            // Reload species
-            loadSpecies();
+            if (saveData()) {
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('newSpeciesModal'));
+                if (modal) modal.hide();
+                
+                // Show success message
+                showToast('Success', 'Species record saved successfully!');
+                
+                // Reload species
+                loadSpecies();
+            }
         }
 
         // Save monitoring
@@ -2861,11 +3206,11 @@
             let isValid = true;
             fields.forEach(field => {
                 const element = document.getElementById(field);
-                if (!element.value) {
-                    element.classList.add('is-invalid');
+                if (!element || !element.value) {
+                    if (element) element.classList.add('is-invalid');
                     isValid = false;
                 } else {
-                    element.classList.remove('is-invalid');
+                    if (element) element.classList.remove('is-invalid');
                 }
             });
             
@@ -2877,7 +3222,7 @@
             // Handle photo upload (simplified for demo)
             const photos = [];
             const fileInput = document.getElementById('monitoringPhotos');
-            if (fileInput.files.length > 0) {
+            if (fileInput && fileInput.files.length > 0) {
                 for (let i = 0; i < fileInput.files.length; i++) {
                     if (fileInput.files[i].type.match('image.*')) {
                         photos.push(URL.createObjectURL(fileInput.files[i]));
@@ -2899,17 +3244,152 @@
             };
             
             db.monitoring.push(newMonitoring);
-            saveData();
+            if (saveData()) {
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('newMonitoringModal'));
+                if (modal) modal.hide();
+                
+                // Show success message
+                showToast('Success', 'Monitoring record saved successfully!');
+                
+                // Reload monitoring
+                loadMonitoring();
+            }
+        }
+
+        // Save fauna sighting
+        function saveFaunaSighting() {
+            const form = document.getElementById('faunaSightingForm');
+            const fields = ['faunaSpecies', 'faunaDate', 'faunaLocation', 'faunaObserver'];
             
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('newMonitoringModal'));
-            modal.hide();
+            let isValid = true;
+            fields.forEach(field => {
+                const element = document.getElementById(field);
+                if (!element || !element.value) {
+                    if (element) element.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    if (element) element.classList.remove('is-invalid');
+                }
+            });
             
-            // Show success message
-            showToast('Success', 'Monitoring record saved successfully!');
+            if (!isValid) return;
             
-            // Reload monitoring
-            loadMonitoring();
+            // Handle photo upload (simplified for demo)
+            const photos = [];
+            const fileInput = document.getElementById('faunaPhotos');
+            if (fileInput && fileInput.files.length > 0) {
+                for (let i = 0; i < fileInput.files.length; i++) {
+                    if (fileInput.files[i].type.match('image.*')) {
+                        photos.push(URL.createObjectURL(fileInput.files[i]));
+                    }
+                }
+            }
+            
+            const newSighting = {
+                id: Date.now(),
+                speciesId: parseInt(document.getElementById('faunaSpecies').value),
+                date: document.getElementById('faunaDate').value,
+                location: document.getElementById('faunaLocation').value,
+                observer: document.getElementById('faunaObserver').value,
+                count: parseInt(document.getElementById('faunaCount').value) || 1,
+                behavior: document.getElementById('faunaBehavior').value,
+                photos: photos,
+                notes: document.getElementById('faunaNotes').value,
+                createdAt: new Date().toISOString()
+            };
+            
+            db.faunaSightings.push(newSighting);
+            
+            // Update species last observed date
+            const species = db.species.find(s => s.id == newSighting.speciesId);
+            if (species) {
+                species.lastObserved = newSighting.date;
+            }
+            
+            if (saveData()) {
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('newFaunaSightingModal'));
+                if (modal) modal.hide();
+                
+                // Show success message
+                showToast('Success', 'Fauna sighting saved successfully!');
+                
+                // Reload species and monitoring
+                loadSpecies();
+                loadMonitoring();
+            }
+        }
+
+        // Save vegetation survey
+        function saveVegetationSurvey() {
+            const form = document.getElementById('vegetationSurveyForm');
+            const fields = ['vegetationDate', 'vegetationLocation', 'vegetationObserver', 'vegetationFindings'];
+            
+            let isValid = true;
+            fields.forEach(field => {
+                const element = document.getElementById(field);
+                if (!element || !element.value) {
+                    if (element) element.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    if (element) element.classList.remove('is-invalid');
+                }
+            });
+            
+            if (!isValid) return;
+            
+            // Handle species selection
+            const selectedSpecies = Array.from(document.getElementById('vegetationSpecies').selectedOptions).map(opt => opt.value);
+            
+            // Handle photo upload (simplified for demo)
+            const photos = [];
+            const fileInput = document.getElementById('vegetationPhotos');
+            if (fileInput && fileInput.files.length > 0) {
+                for (let i = 0; i < fileInput.files.length; i++) {
+                    if (fileInput.files[i].type.match('image.*')) {
+                        photos.push(URL.createObjectURL(fileInput.files[i]));
+                    }
+                }
+            }
+            
+            const newSurvey = {
+                id: Date.now(),
+                date: document.getElementById('vegetationDate').value,
+                location: document.getElementById('vegetationLocation').value,
+                observer: document.getElementById('vegetationObserver').value,
+                species: selectedSpecies,
+                nativeCover: parseInt(document.getElementById('vegetationCover').value) || 0,
+                weedCover: parseInt(document.getElementById('vegetationWeedCover').value) || 0,
+                health: document.getElementById('vegetationHealth').value,
+                findings: document.getElementById('vegetationFindings').value,
+                photos: photos,
+                notes: document.getElementById('vegetationNotes').value,
+                createdAt: new Date().toISOString()
+            };
+            
+            db.vegetationSurveys.push(newSurvey);
+            
+            // Update species last observed dates
+            selectedSpecies.forEach(speciesId => {
+                const species = db.species.find(s => s.id == speciesId);
+                if (species) {
+                    species.lastObserved = newSurvey.date;
+                }
+            });
+            
+            if (saveData()) {
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('newVegetationSurveyModal'));
+                if (modal) modal.hide();
+                
+                // Show success message
+                showToast('Success', 'Vegetation survey saved successfully!');
+                
+                // Reload species and monitoring
+                loadSpecies();
+                loadMonitoring();
+            }
         }
 
         // Save compliance checklist
@@ -2933,20 +3413,20 @@
                 }
             });
             
-            saveData();
-            
-            // Show success message
-            showToast('Success', 'Compliance checklist saved successfully!');
-            
-            // Update dashboard
-            loadDashboard();
+            if (saveData()) {
+                // Show success message
+                showToast('Success', 'Compliance checklist saved successfully!');
+                
+                // Update dashboard
+                loadDashboard();
+            }
         }
 
         // Save user profile
         function saveUserProfile() {
             const form = document.getElementById('userProfileForm');
-            if (!form.checkValidity()) {
-                form.classList.add('was-validated');
+            if (!form || !form.checkValidity()) {
+                if (form) form.classList.add('was-validated');
                 return;
             }
             
@@ -2956,17 +3436,17 @@
                 role: document.getElementById('userRole').value
             };
             
-            saveData();
-            
-            // Show success message
-            showToast('Success', 'User profile updated successfully!');
+            if (saveData()) {
+                // Show success message
+                showToast('Success', 'User profile updated successfully!');
+            }
         }
 
         // Change password
         function changePassword() {
             const form = document.getElementById('changePasswordForm');
-            if (!form.checkValidity()) {
-                form.classList.add('was-validated');
+            if (!form || !form.checkValidity()) {
+                if (form) form.classList.add('was-validated');
                 return;
             }
             
@@ -2989,8 +3469,8 @@
         // Save site settings
         function saveSiteSettings() {
             const form = document.getElementById('siteSettingsForm');
-            if (!form.checkValidity()) {
-                form.classList.add('was-validated');
+            if (!form || !form.checkValidity()) {
+                if (form) form.classList.add('was-validated');
                 return;
             }
             
@@ -3002,10 +3482,10 @@
                 siteDescription: document.getElementById('siteDescription').value
             };
             
-            saveData();
-            
-            // Show success message
-            showToast('Success', 'Site settings updated successfully!');
+            if (saveData()) {
+                // Show success message
+                showToast('Success', 'Site settings updated successfully!');
+            }
         }
 
         // Export all data
@@ -3061,13 +3541,13 @@
             };
             
             db.reports.push(newReport);
-            saveData();
-            
-            // Show the report
-            showReportDetails(newReport);
-            
-            // Show success message
-            showToast('Success', 'Compliance report generated successfully!');
+            if (saveData()) {
+                // Show the report
+                showReportDetails(newReport);
+                
+                // Show success message
+                showToast('Success', 'Compliance report generated successfully!');
+            }
         }
 
         // Generate report
@@ -3118,13 +3598,13 @@
             };
             
             db.reports.push(newReport);
-            saveData();
-            
-            // Show the report
-            showReportDetails(newReport);
-            
-            // Show success message
-            showToast('Success', `${reportTitle} generated successfully!`);
+            if (saveData()) {
+                // Show the report
+                showReportDetails(newReport);
+                
+                // Show success message
+                showToast('Success', `${reportTitle} generated successfully!`);
+            }
         }
 
         // Generate report from modal
@@ -3141,7 +3621,7 @@
             
             // Close modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('generateReportModal'));
-            modal.hide();
+            if (modal) modal.hide();
             
             // Generate the report
             generateReport(type);
@@ -3150,6 +3630,7 @@
         // Show assessment details
         function showAssessmentDetails(assessment) {
             const modalBody = document.getElementById('assessmentModalBody');
+            if (!modalBody) return;
             
             modalBody.innerHTML = `
                 <div class="row mb-3">
@@ -3210,6 +3691,7 @@
         // Show species details
         function showSpeciesDetails(species) {
             const modalBody = document.getElementById('speciesModalBody');
+            if (!modalBody) return;
             
             modalBody.innerHTML = `
                 <div class="row mb-3">
@@ -3281,6 +3763,7 @@
         // Show activity details
         function showActivityDetails(activity) {
             const modalBody = document.getElementById('activityModalBody');
+            if (!modalBody) return;
             
             modalBody.innerHTML = `
                 <div class="row mb-3">
@@ -3347,13 +3830,15 @@
             
             // Set up the complete button if activity is not completed
             const completeBtn = document.getElementById('completeActivity');
-            if (activity.status === 'completed') {
-                completeBtn.style.display = 'none';
-            } else {
-                completeBtn.style.display = 'inline-block';
-                completeBtn.onclick = function() {
-                    completeActivity(activity.id);
-                };
+            if (completeBtn) {
+                if (activity.status === 'completed') {
+                    completeBtn.style.display = 'none';
+                } else {
+                    completeBtn.style.display = 'inline-block';
+                    completeBtn.onclick = function() {
+                        completeActivity(activity.id);
+                    };
+                }
             }
             
             const modal = new bootstrap.Modal(document.getElementById('viewActivityModal'));
@@ -3363,6 +3848,7 @@
         // Show monitoring details
         function showMonitoringDetails(monitoring) {
             const modalBody = document.getElementById('monitoringModalBody');
+            if (!modalBody) return;
             
             modalBody.innerHTML = `
                 <div class="row mb-3">
@@ -3435,6 +3921,7 @@
         // Show report details
         function showReportDetails(report) {
             const modalBody = document.getElementById('reportModalBody');
+            if (!modalBody) return;
             
             modalBody.innerHTML = `
                 <div class="row mb-3">
@@ -3559,9 +4046,12 @@
             `;
             
             // Set up the download button
-            document.getElementById('downloadReport').onclick = function() {
-                downloadReport(report);
-            };
+            const downloadBtn = document.getElementById('downloadReport');
+            if (downloadBtn) {
+                downloadBtn.onclick = function() {
+                    downloadReport(report);
+                };
+            }
             
             const modal = new bootstrap.Modal(document.getElementById('viewReportModal'));
             modal.show();
@@ -3573,18 +4063,20 @@
             if (activity) {
                 activity.status = 'completed';
                 activity.endDate = new Date().toISOString();
-                saveData();
-                
-                // Close the modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById('viewActivityModal'));
-                modal.hide();
-                
-                // Show success message
-                showToast('Success', 'Activity marked as completed!');
-                
-                // Reload activities
-                loadActivities();
-                window.calendar.refetchEvents();
+                if (saveData()) {
+                    // Close the modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('viewActivityModal'));
+                    if (modal) modal.hide();
+                    
+                    // Show success message
+                    showToast('Success', 'Activity marked as completed!');
+                    
+                    // Reload activities
+                    loadActivities();
+                    if (window.calendar) {
+                        window.calendar.refetchEvents();
+                    }
+                }
             }
         }
 
@@ -3598,16 +4090,20 @@
         // Show confirmation dialog
         function showConfirmation(title, message, confirmCallback) {
             const modalBody = document.getElementById('confirmationModalBody');
+            if (!modalBody) return;
+            
             modalBody.innerHTML = message;
             
             document.getElementById('confirmationModalLabel').textContent = title;
             
             const confirmBtn = document.getElementById('confirmAction');
-            confirmBtn.onclick = function() {
-                confirmCallback();
-                const modal = bootstrap.Modal.getInstance(document.getElementById('confirmationModal'));
-                modal.hide();
-            };
+            if (confirmBtn) {
+                confirmBtn.onclick = function() {
+                    confirmCallback();
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('confirmationModal'));
+                    if (modal) modal.hide();
+                };
+            }
             
             const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
             modal.show();
@@ -3616,15 +4112,118 @@
         // Validate components selection
         function validateComponents() {
             const selectedComponents = Array.from(document.querySelectorAll('input[name="components"]:checked')).map(cb => cb.value);
-            if (selectedComponents.length === 0) {
-                document.getElementById('componentsFeedback').style.display = 'block';
-            } else {
-                document.getElementById('componentsFeedback').style.display = 'none';
+            const componentsFeedback = document.getElementById('componentsFeedback');
+            if (componentsFeedback) {
+                if (selectedComponents.length === 0) {
+                    componentsFeedback.style.display = 'block';
+                } else {
+                    componentsFeedback.style.display = 'none';
+                }
+            }
+        }
+
+        // Export dashboard
+        function exportDashboard() {
+            showToast('Info', 'Dashboard export functionality would be implemented here', 'info');
+        }
+
+        // Print dashboard
+        function printDashboard() {
+            window.print();
+        }
+
+        // Export species
+        function exportSpecies() {
+            const dataStr = JSON.stringify(db.species, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `species-data-${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showToast('Success', 'Species data exported successfully!');
+        }
+
+        // Print species
+        function printSpecies() {
+            // Create a printable version of the species table
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Species Register</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; }
+                        table { width: 100%; border-collapse: collapse; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #f2f2f2; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Species Register</h1>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Scientific Name</th>
+                                <th>Common Name</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Last Observed</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${db.species.map(species => `
+                                <tr>
+                                    <td>${species.scientificName}</td>
+                                    <td>${species.commonName || '-'}</td>
+                                    <td>${capitalizeFirstLetter(species.type)}</td>
+                                    <td>${capitalizeFirstLetter(species.status)}</td>
+                                    <td>${species.lastObserved ? formatDate(species.lastObserved) : 'Not recorded'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        // View all fauna
+        function viewAllFauna() {
+            // Switch to monitoring tab and filter for fauna
+            const monitoringTab = document.querySelector('a[href="#monitoring"]');
+            if (monitoringTab) {
+                monitoringTab.click();
+                
+                // In a real implementation, we would filter the monitoring table
+                setTimeout(() => {
+                    showToast('Info', 'Viewing all fauna monitoring records', 'info');
+                }, 500);
+            }
+        }
+
+        // View all vegetation
+        function viewAllVegetation() {
+            // Switch to monitoring tab and filter for vegetation
+            const monitoringTab = document.querySelector('a[href="#monitoring"]');
+            if (monitoringTab) {
+                monitoringTab.click();
+                
+                // In a real implementation, we would filter the monitoring table
+                setTimeout(() => {
+                    showToast('Info', 'Viewing all vegetation monitoring records', 'info');
+                }, 500);
             }
         }
 
         // Helper function to capitalize first letter
         function capitalizeFirstLetter(string) {
+            if (!string) return '';
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
 
